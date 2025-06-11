@@ -7,7 +7,11 @@ function Dashboard() {
   const token = localStorage.getItem('token');
 
   const handleSignOut = () => {
+    // Clear all profile-related data from localStorage
     localStorage.removeItem('token');
+    localStorage.removeItem('profileForm');
+    localStorage.removeItem('profileStep');
+    localStorage.removeItem('profilePhoto');
     window.location.href = '/auth/login';
   };
 
@@ -56,6 +60,7 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header - Made Sticky */}
+      
       <header className="bg-black border-b border-[#8D2B7E]/20 p-4 fixed top-0 left-0 right-0 z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2">
@@ -73,17 +78,17 @@ function Dashboard() {
               <Link to="/network" className="hover:text-[#8D2B7E]">My Network</Link>
               <Link to="/chats" className="hover:text-[#8D2B7E]">Chats</Link>
             </nav>
-            <div className="w-10 h-10 bg-[#8D2B7E] rounded-full overflow-hidden">
+            <div className="w-10 h-10 bg-[#8D2B7E] rounded-full overflow-hidden flex items-center justify-center">
               {userData?.profilePicture ? (
                 <img 
-                  src={userData.profilePicture} 
+                  src={`data:image/jpeg;base64,${userData.profilePicture}`}
                   alt="Profile" 
-                  className="w-full h-full rounded-full object-cover"
+                  className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-white">
-                  {userData?.username?.charAt(0)?.toUpperCase()}
-                </div>
+                <span className="text-white text-lg font-semibold">
+                  {userData?.username?.charAt(0)?.toUpperCase() || 'U'}
+                </span>
               )}
             </div>
           </div>
@@ -127,22 +132,22 @@ function Dashboard() {
           <div className="bg-[#111] rounded-3xl border border-[#8D2B7E]/20 p-6 mb-8">
             <h2 className="text-2xl font-bold mb-6">Your Profile</h2>
             <div className="flex items-start space-x-6">
-              <div className="w-24 h-24 bg-[#8D2B7E] rounded-full overflow-hidden">
+              <div className="w-24 h-24 bg-[#8D2B7E] rounded-full overflow-hidden flex items-center justify-center">
                 {userData?.profilePicture ? (
                   <img 
-                    src={userData.profilePicture} 
+                    src={`data:image/jpeg;base64,${userData.profilePicture}`}
                     alt="Profile" 
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-white text-3xl">
-                    {userData?.username?.charAt(0)?.toUpperCase()}
-                  </div>
+                  <span className="text-white text-4xl font-semibold">
+                    {userData?.username?.charAt(0)?.toUpperCase() || 'U'}
+                  </span>
                 )}
               </div>
               <div className="space-y-2">
                 <p className="text-lg">Name: {userData?.username || 'Not set'}</p>
-                <p>Experience: {userData?.experienceYear ? `${userData.experienceYear} year${userData.experienceYear > 1 ? 's' : ''}` : 'Not set'}</p>
+                <p>Experience: {userData?.experienceYear !== undefined && userData?.experienceYear !== null ? `${userData.experienceYear} year${userData.experienceYear !== 1 ? 's' : ''}` : 'Not set'}</p>
                 <p>Languages: {userData?.preferredLanguages?.length > 0 ? userData.preferredLanguages.join(', ') : 'Not set'}</p>
                 <p>Additional Skills: {userData?.additionalSkills?.length > 0 ? userData.additionalSkills.join(', ') : 'Not set'}</p>
                 <p>Availability: {userData?.availability || 'Not set'}</p>

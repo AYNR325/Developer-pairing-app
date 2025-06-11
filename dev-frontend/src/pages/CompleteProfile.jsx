@@ -2,9 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { ToastContainer,toast } from 'react-toastify';
+
 function CompleteProfile() {
-  const [step, setStep] = useState(1);
-  const [photoPreview, setPhotoPreview] = useState(null);
+  const [step, setStep] = useState(() => {
+    const saved = localStorage.getItem('profileStep');
+    return saved ? parseInt(saved) : 1;
+  });
+  const [photoPreview, setPhotoPreview] = useState(() => {
+    const saved = localStorage.getItem('profilePhoto');
+    return saved || null;
+  });
   const navigate = useNavigate();
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
     defaultValues: {
@@ -18,8 +26,30 @@ function CompleteProfile() {
       domains: [],
       availability: 'FULL-TIME',
       photo: null
-    }
+    },
+    mode: 'onChange'
   });
+
+  // Save step to localStorage
+  useEffect(() => {
+    localStorage.setItem('profileStep', step.toString());
+  }, [step]);
+
+  // Save photo preview to localStorage
+  useEffect(() => {
+    if (photoPreview) {
+      localStorage.setItem('profilePhoto', photoPreview);
+    }
+  }, [photoPreview]);
+
+  // Save form data to localStorage whenever it changes
+  useEffect(() => {
+    const subscription = watch((value) => {
+      const { email, username, ...rest } = value;
+      localStorage.setItem('profileForm', JSON.stringify(rest));
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
 
   // Get token from localStorage
   const token = localStorage.getItem('token');
@@ -32,15 +62,29 @@ function CompleteProfile() {
         });
         
         if (response.data.success) {
-          // Pre-fill the form with user data from the response
-          setValue('email', response.data.user.email);
-          setValue('username', response.data.user.username);
+          const userData = response.data.user;
           
-          // Disable email and username fields since they're already set
-          const emailInput = document.querySelector('input[name="email"]');
-          const usernameInput = document.querySelector('input[name="username"]');
-          if (emailInput) emailInput.disabled = true;
-          if (usernameInput) usernameInput.disabled = true;
+          // Clear any existing form data when loading a new user
+          localStorage.removeItem('profileForm');
+          localStorage.removeItem('profileStep');
+          localStorage.removeItem('profilePhoto');
+          
+          // Always set email and username from API
+          setValue('email', userData.email);
+          setValue('username', userData.username);
+
+          // Set other fields from API data
+          setValue('location', userData.location || '');
+          setValue('bio', userData.bio || '');
+          setValue('experienceLevel', userData.experienceLevel || 'BEGINNER');
+          setValue('experienceYears', userData.experienceYear || 0);
+          setValue('programmingLanguages', userData.preferredLanguages || []);
+          setValue('domains', userData.additionalSkills || []);
+          setValue('availability', userData.availability || 'FULL-TIME');
+          
+          if (userData.profilePicture) {
+            setPhotoPreview(`data:image/jpeg;base64,${userData.profilePicture}`);
+          }
         }
       } catch (err) {
         console.error('Error fetching user data:', err);
@@ -51,6 +95,162 @@ function CompleteProfile() {
       fetchUserData();
     }
   }, [token, setValue]);
+
+  const handleNext = () => {
+    setStep(2);
+  };
+
+  const handleBack = () => {
+    setStep(1);
+  };
+
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // Compress the image
+        const img = new Image();
+        img.src = reader.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          
+          // Set canvas dimensions to max 200x200 while maintaining aspect ratio
+          const MAX_WIDTH = 200;
+          const MAX_HEIGHT = 200;
+          let width = img.width;
+          let height = img.height;
+          
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // Convert to base64 with reduced quality
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.5);
+          setPhotoPreview(compressedBase64);
+        };
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleLanguageToggle = (language) => {
+    const currentLanguages = watch('programmingLanguages') || [];
+    const updatedLanguages = currentLanguages.includes(language)
+      ? currentLanguages.filter(lang => lang !== language)
+      : [...currentLanguages, language];
+    setValue('programmingLanguages', updatedLanguages);
+  };
+
+  const handleDomainToggle = (domain) => {
+    const currentDomains = watch('domains') || [];
+    const updatedDomains = currentDomains.includes(domain)
+      ? currentDomains.filter(d => d !== domain)
+      : [...currentDomains, domain];
+    setValue('domains', updatedDomains);
+  };
+
+  // Clear localStorage when form is submitted successfully
+  const onSubmit = async (data) => {
+    try {
+      // Validate required fields
+      if (!data.programmingLanguages || data.programmingLanguages.length === 0) {
+        // alert("Please select at least one programming language");
+        toast.error("Please select at least one programming language", {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          
+        });
+        return;
+      }
+      if (!data.domains || data.domains.length === 0) {
+        // alert("Please select at least one domain");
+        toast.error("Please select at least one domain", {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          
+        });
+        return;
+      }
+
+      // Transform the data to match backend field names
+      const submitData = {
+        location: data.location,
+        bio: data.bio,
+        experienceLevel: data.experienceLevel,
+        experienceYear: data.experienceYears,
+        preferredLanguages: data.programmingLanguages,
+        availability: data.availability,
+        additionalSkills: data.domains,
+        profilePicture: photoPreview ? photoPreview.split(',')[1] : null // Remove the data URL prefix
+      };
+
+      const response = await axios.put("http://localhost:3000/api/auth/complete-profile", submitData, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      // Clear all saved data after successful submission
+      localStorage.removeItem('profileForm');
+      localStorage.removeItem('profileStep');
+      localStorage.removeItem('profilePhoto');
+      
+      // alert("Profile updated!");
+      toast.success('Profile updated!', {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: false,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "dark",
+                        
+                        });
+      navigate('/dashboard');
+    } catch (err) {
+      console.error(err);
+      // alert(err.response?.data?.message || "Error updating profile");
+      toast.error(err.response?.data?.message || "Error updating profile", {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        
+      });
+    }
+  };
 
   const programmingLanguages = [
     'JavaScript', 'Python', 'Java',
@@ -73,68 +273,21 @@ function CompleteProfile() {
     'IoT'
   ];
 
-  const handleNext = () => {
-    setStep(2);
-  };
-
-  const handleBack = () => {
-    setStep(1);
-  };
-
-  const handleLanguageToggle = (language) => {
-    const currentLanguages = watch('programmingLanguages') || [];
-    const updatedLanguages = currentLanguages.includes(language)
-      ? currentLanguages.filter(lang => lang !== language)
-      : [...currentLanguages, language];
-    setValue('programmingLanguages', updatedLanguages);
-  };
-
-  const handleDomainToggle = (domain) => {
-    const currentDomains = watch('domains') || [];
-    const updatedDomains = currentDomains.includes(domain)
-      ? currentDomains.filter(d => d !== domain)
-      : [...currentDomains, domain];
-    setValue('domains', updatedDomains);
-  };
-
-  const handlePhotoChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPhotoPreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const onSubmit = async (data) => {
-    try {
-      // Transform the data to match backend field names
-      const submitData = {
-        location: data.location,
-        bio: data.bio,
-        experienceLevel: data.experienceLevel,
-        experienceYear: data.experienceYears,
-        preferredLanguages: data.programmingLanguages,
-        availability: data.availability,
-        additionalSkills: data.domains,
-        profilePicture: photoPreview // Send the base64 string
-      };
-
-      await axios.put("http://localhost:3000/api/auth/complete-profile", submitData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      alert("Profile updated!");
-      navigate('/dashboard');
-    } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.message || "Error updating profile");
-    }
-  };
-
   return (
     <div className="min-h-screen bg-black text-white p-6">
+      <ToastContainer
+position="top-center"
+autoClose={5000}
+hideProgressBar={false}
+newestOnTop={false}
+closeOnClick={false}
+rtl={false}
+pauseOnFocusLoss
+draggable
+pauseOnHover
+theme="dark"
+
+/>
       <div className="flex items-center gap-2 mb-8">
         <span className="text-[#8D2B7E] text-2xl">&lt;/&gt;</span>
         <span className="text-[#8D2B7E] text-2xl font-semibold">DevHub</span>
@@ -163,6 +316,7 @@ function CompleteProfile() {
                           message: "Username can only contain letters, numbers, underscores and dashes"
                         }
                       })}
+                      disabled
                       className={`w-full bg-black border ${errors.username ? 'border-red-500' : 'border-[#8D2B7E]/20'} rounded-md p-3 focus:outline-none focus:border-[#8D2B7E] disabled:opacity-50 disabled:cursor-not-allowed`}
                     />
                     {errors.username && (
@@ -180,6 +334,7 @@ function CompleteProfile() {
                           message: "Invalid email address"
                         }
                       })}
+                      disabled
                       className={`w-full bg-black border ${errors.email ? 'border-red-500' : 'border-[#8D2B7E]/20'} rounded-md p-3 focus:outline-none focus:border-[#8D2B7E] disabled:opacity-50 disabled:cursor-not-allowed`}
                     />
                     {errors.email && (
@@ -192,7 +347,8 @@ function CompleteProfile() {
                       type="text"
                       placeholder="Location"
                       {...register("location", {
-                        required: "Location is required"
+                        required: "Location is required",
+                        minLength: { value: 2, message: "Location must be at least 2 characters" }
                       })}
                       className={`w-full bg-black border ${errors.location ? 'border-red-500' : 'border-[#8D2B7E]/20'} rounded-md p-3 focus:outline-none focus:border-[#8D2B7E]`}
                     />
@@ -236,7 +392,11 @@ function CompleteProfile() {
                       </button>
                     </div>
                   ) : (
-                    <div className="w-32 h-32 bg-[#8D2B7E] rounded-full mb-4"></div>
+                    <div className="w-32 h-32 bg-[#8D2B7E] rounded-full mb-4 flex items-center justify-center">
+                      <span className="text-white text-4xl font-semibold">
+                        {watch('username')?.charAt(0)?.toUpperCase() || 'U'}
+                      </span>
+                    </div>
                   )}
                   <div className="w-40 h-40 bg-[#8D2B7E]/20 rounded-3xl"></div>
                   <input
@@ -292,6 +452,9 @@ function CompleteProfile() {
                         </button>
                       ))}
                     </div>
+                    {errors.experienceLevel && (
+                      <p className="text-red-500 text-sm mt-1">{errors.experienceLevel.message}</p>
+                    )}
                   </div>
 
                   <div>
@@ -299,6 +462,7 @@ function CompleteProfile() {
                     <input
                       type="number"
                       {...register("experienceYears", {
+                        required: "Experience years is required",
                         min: { value: 0, message: "Experience years cannot be negative" },
                         max: { value: 50, message: "Please enter a valid experience" }
                       })}
@@ -328,6 +492,9 @@ function CompleteProfile() {
                         </button>
                       ))}
                     </div>
+                    {errors.programmingLanguages && (
+                      <p className="text-red-500 text-sm mt-1">{errors.programmingLanguages.message}</p>
+                    )}
                   </div>
 
                   <div>
@@ -348,6 +515,9 @@ function CompleteProfile() {
                         </button>
                       ))}
                     </div>
+                    {errors.domains && (
+                      <p className="text-red-500 text-sm mt-1">{errors.domains.message}</p>
+                    )}
                   </div>
 
                   <div>
@@ -368,6 +538,9 @@ function CompleteProfile() {
                         </button>
                       ))}
                     </div>
+                    {errors.availability && (
+                      <p className="text-red-500 text-sm mt-1">{errors.availability.message}</p>
+                    )}
                   </div>
                 </div>
               </div>

@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["Beginner", "Intermediate", "Expert"],
     },
-    experienceYear: { type: Number, default: 0 },
+    experienceYear: { type: Number },
     location: { type: String, default: "" },
     preferredLanguages: {
       type: [String],

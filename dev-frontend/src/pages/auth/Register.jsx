@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { User, Mail, Lock } from 'lucide-react';
+import { ToastContainer,toast } from 'react-toastify';
 
 function Register() {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -14,10 +15,47 @@ function Register() {
     try {
       setIsLoading(true);
       const res = await axios.post("http://localhost:3000/api/auth/register", data);
-      alert("Registration successful");
-      navigate("/auth/login");
+      if(res?.data?.success){
+        // alert("Registration successful");
+        toast.success('Registration successful', {
+                  position: "top-center",
+                  autoClose: 5000,
+                  hideProgressBar: false,
+                  closeOnClick: false,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                  theme: "dark",
+                  
+                  });
+        navigate("/auth/login");
+      } else {
+        // alert(res.data.message);
+        toast.error(res.data.message, {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          
+        });
+      }
     } catch (err) {
-      alert("Registration failed");
+      // alert("Registration failed");
+      toast.error('Registration failed', {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        
+      });
     } finally {
       setIsLoading(false);
     }
@@ -25,6 +63,19 @@ function Register() {
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
+       <ToastContainer
+position="top-center"
+autoClose={5000}
+hideProgressBar={false}
+newestOnTop={false}
+closeOnClick={false}
+rtl={false}
+pauseOnFocusLoss
+draggable
+pauseOnHover
+theme="dark"
+
+/>
       <div className="w-full max-w-md space-y-8 bg-[#111] rounded-3xl border border-[#8D2B7E]/20 p-8">
         <div className="text-center">
           <h1 className="text-3xl font-bold text-white mb-2">Register</h1>
