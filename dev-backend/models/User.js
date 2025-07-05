@@ -56,6 +56,12 @@ const userSchema = new mongoose.Schema(
         "IoT",
       ],
     },
+    sprints: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Sprint' }],
+    
+    // Track incoming connection requests (user IDs)
+    connectionRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    // Track accepted connections (user IDs)
+    connections: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   },
   { timestamps: true }
 );

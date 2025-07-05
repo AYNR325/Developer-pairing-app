@@ -20,11 +20,11 @@ function CompleteProfile() {
       username: '',
       location: '',
       bio: '',
-      experienceLevel: 'BEGINNER',
+      experienceLevel: 'Beginner',
       experienceYears: 0,
       programmingLanguages: [],
       domains: [],
-      availability: 'FULL-TIME',
+      availability: 'Full-time',
       photo: null
     },
     mode: 'onChange'
@@ -437,7 +437,7 @@ theme="dark"
                   <div>
                     <p className="mb-2">Experience Level:</p>
                     <div className="flex gap-4">
-                      {['BEGINNER', 'INTERMEDIATE', 'EXPERT'].map(level => (
+                      {['Beginner', 'Intermediate', 'Expert'].map(level => (
                         <button
                           key={level}
                           type="button"
@@ -523,7 +523,7 @@ theme="dark"
                   <div>
                     <p className="mb-2">Availability</p>
                     <div className="flex gap-4">
-                      {['FULL-TIME', 'WEEKENDS', 'PART-TIME'].map(time => (
+                      {['Full-time', 'Weekends', 'Part-time'].map(time => (
                         <button
                           key={time}
                           type="button"

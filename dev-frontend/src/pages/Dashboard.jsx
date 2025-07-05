@@ -68,11 +68,11 @@ function Dashboard() {
             <span className="text-[#8D2B7E] text-2xl font-semibold">DevHub</span>
           </div>
           <div className="flex items-center space-x-8">
-            <input
+            {/* <input
               type="search"
               placeholder="Search"
               className="bg-black border border-[#8D2B7E]/20 rounded-lg px-4 py-2 focus:outline-none focus:border-[#8D2B7E]"
-            />
+            /> */}
             <nav className="flex space-x-6">
               <Link to="/dashboard" className="hover:text-[#8D2B7E]">Home</Link>
               <Link to="/network" className="hover:text-[#8D2B7E]">My Network</Link>
@@ -102,11 +102,14 @@ function Dashboard() {
             <Link to="/dashboard" className="block py-2 px-4 bg-[#8D2B7E] text-white rounded">
               Dashboard
             </Link>
+            <Link to="/search" className="block py-2 px-4 hover:bg-[#8D2B7E]/80 text-white rounded">
+              Search Developers
+            </Link>
             <Link to="/join-challenge" className="block py-2 px-4 hover:bg-[#8D2B7E]/80 text-white rounded">
               Join Challenge
             </Link>
-            <Link to="/create-challenge" className="block py-2 px-4 hover:bg-[#8D2B7E]/80 text-white rounded">
-              Create Challenge
+            <Link to="/create-sprint" className="block py-2 px-4 hover:bg-[#8D2B7E]/80 text-white rounded">
+              Create Sprint
             </Link>
             <Link to="/help" className="block py-2 px-4 hover:bg-[#8D2B7E]/80 text-white rounded">
               Help Center
