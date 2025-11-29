@@ -784,9 +784,9 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## 👤 Author
 
 **Ayush Rokade**
-- GitHub: [@yourusername](https://github.com/AYNR325)
+- [Github](https://github.com/AYNR325)
 - Email: ayushnr35@gmail.com
-- LinkedIn: [Your LinkedIn](https://www.linkedin.com/in/ayush-rokade-972940310)
+- [LinkedIn](https://www.linkedin.com/in/ayush-rokade-972940310)
 
 ---
 
