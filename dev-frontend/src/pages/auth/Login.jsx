@@ -234,16 +234,16 @@ theme="dark"
             {isLoading ? 'Signing in...' : 'Sign In'}
           </button>
 
-          <div className="relative">
+          {/* <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-700"></div>
             </div>
             <div className="relative flex justify-center text-sm">
               <span className="px-2 bg-[#111] text-gray-400">or</span>
             </div>
-          </div>
+          </div> */}
 
-          <div className="grid grid-cols-3 gap-4">
+          {/* <div className="grid grid-cols-3 gap-4">
             <button
               type="button"
               className="flex items-center justify-center p-2 bg-black rounded-lg border border-[#8D2B7E]/20 hover:border-[#8D2B7E] transition-colors"
@@ -262,7 +262,7 @@ theme="dark"
             >
               <img src="/linkedin.png" alt="LinkedIn" className="w-6 h-6" />
             </button>
-          </div>
+          </div> */}
         </form>
       </div>
     </div>

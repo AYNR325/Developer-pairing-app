@@ -153,7 +153,7 @@ theme="dark"
             {isLoading ? 'Creating account...' : 'Sign Up'}
           </button>
 
-          <div className="relative">
+          {/* <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-700"></div>
             </div>
@@ -181,7 +181,7 @@ theme="dark"
             >
               <img src="/linkedin.png" alt="LinkedIn" className="w-6 h-6" />
             </button>
-          </div>
+          </div> */}
         </form>
       </div>
     </div>
