@@ -7,10 +7,17 @@ const http = require('http');
 const socketIo = require('socket.io');
 const app = express()
 const server = http.createServer(app);
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  process.env.CLIENT_BASE_URL, // e.g. "https://developer-pairing-app-frontend.vercel.app"
+].filter(Boolean); // remove undefined/null
+
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:5173" || process.env.CLIENT_BASE_URL || "*",
-    methods: ["GET", "POST"]
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
@@ -28,8 +35,18 @@ mongoose.connect(process.env.MONGO_URL)
 
 // Configure CORS first
 app.use(cors({
-  origin: 'http://localhost:5173' || process.env.CLIENT_BASE_URL || "*" ,
-  credentials: true
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like Postman, curl)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    console.log("❌ CORS blocked origin:", origin);
+    return callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
 }));
 
 // Configure body-parser with increased limits
