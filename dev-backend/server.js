@@ -9,7 +9,7 @@ const app = express()
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:5173" || process.env.CLIENT_BASE_URL,
+    origin: "http://localhost:5173" || process.env.CLIENT_BASE_URL || "*",
     methods: ["GET", "POST"]
   }
 });
@@ -28,7 +28,7 @@ mongoose.connect(process.env.MONGO_URL)
 
 // Configure CORS first
 app.use(cors({
-  origin: 'http://localhost:5173' || process.env.CLIENT_BASE_URL,
+  origin: 'http://localhost:5173' || process.env.CLIENT_BASE_URL || "*" ,
   credentials: true
 }));
 
