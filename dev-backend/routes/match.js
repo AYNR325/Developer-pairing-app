@@ -2,8 +2,17 @@ const express = require('express');
 const router = express.Router();
 const matchController = require('../controllers/match-controller');
 
-// Search for developers
+// Search for developers (rule-based)
 router.get('/', matchController.searchDevelopers);
+
+// AI-powered developer partner recommendations
+router.get('/ai/developers', matchController.getAIDeveloperMatches);
+
+// AI-powered sprint recommendations
+router.get('/ai/sprints', matchController.getAISprintMatches);
+
+// Helper: Get all users (for testing - to get userIds)
+router.get('/test/users', matchController.getAllUsersForTesting);
 
 // Send connection request
 router.post('/request', matchController.sendConnectionRequest);
@@ -22,5 +31,11 @@ router.get('/requests/:userId', matchController.getPendingRequests);
 
 // Get user connections
 router.get('/connections/:userId', matchController.getConnections);
+
+// Get sent connection requests
+router.get('/sent-requests/:userId', matchController.getSentRequests);
+
+// Cancel a sent connection request
+router.delete('/request/:requestId', matchController.cancelConnectionRequest);
 
 module.exports = router; 

@@ -5,10 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Mail, Lock } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
+import { useUser } from '@/context/UserContext';
 
 function Login() {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const navigate = useNavigate();
+  const { refreshUser } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   // const token = localStorage.getItem('token');
 
@@ -82,11 +84,12 @@ function Login() {
       setIsLoading(true);
   
       // Step 1: Login request
-      const res = await axios.post("http://localhost:3000/api/auth/login", data);
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/login`, data);
   
       if (res?.data?.success) {
         const token = res.data.token;
         localStorage.setItem("token", token);
+        refreshUser(); // Immediately fetch user data in the same tab
   
         // Show toast
         toast.success("Login successful", {
@@ -101,7 +104,7 @@ function Login() {
         });
   
         // Step 2: Fetch user profile using token
-        const response = await axios.get("http://localhost:3000/api/auth/check-auth", {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/check-auth`, {
           headers: { Authorization: `Bearer ${token}` },
         });
   

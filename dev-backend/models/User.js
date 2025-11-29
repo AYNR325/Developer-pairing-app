@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema(
     email: { type: String, unique: true },
     password: { type: String, unique: true },
     profilePicture: { type: String },
-    bio: { type: String ,default: ""},
+    bio: { type: String, default: "" },
     experienceLevel: {
       type: String,
       enum: ["Beginner", "Intermediate", "Expert"],
@@ -56,12 +56,24 @@ const userSchema = new mongoose.Schema(
         "IoT",
       ],
     },
-    sprints: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Sprint' }],
-    
+    sprints: [{ type: mongoose.Schema.Types.ObjectId, ref: "Sprint" }],
+
     // Track incoming connection requests (user IDs)
-    connectionRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    connectionRequests: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    ],
     // Track accepted connections (user IDs)
-    connections: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    connections: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+
+    // --- AI matching fields ---
+    // Natural language summary used for embeddings
+    embeddingText: { type: String },
+    // Vector from Gemini embeddings (stored as plain array)
+    embedding: { type: [Number], default: undefined },
+    // Optional: short performance summary you can compute later
+    performanceSummary: { type: String },
+    // Optional: short coding-style summary (e.g. from GitHub)
+    codingStyleSummary: { type: String },
   },
   { timestamps: true }
 );

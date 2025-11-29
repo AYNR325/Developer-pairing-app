@@ -20,6 +20,7 @@ const matchRouter = require('./routes/match');
 const sprintRouter = require('./routes/sprint-routes');
 const taskRouter = require('./routes/task-routes');
 const msgRouter = require('./routes/msg-routes');
+const directMessageRouter = require('./routes/direct-message-routes');
 
 mongoose.connect(process.env.MONGO_URL)
 .then(() => console.log('Connected to MongoDB'))
@@ -27,7 +28,7 @@ mongoose.connect(process.env.MONGO_URL)
 
 // Configure CORS first
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: 'http://localhost:5173' ,
   credentials: true
 }));
 
@@ -48,27 +49,66 @@ app.use('/api/match', matchRouter);
 app.use('/api/sprint', sprintRouter);
 
 //add task route
-app.use('/api/task',taskRouter);
+app.use('/api/tasks',taskRouter);
 
 //add message route
 app.use('/api/message', msgRouter);
+
+//add direct message route
+app.use('/api/direct-messages', directMessageRouter);
 
 // Socket.io connection handling
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
 
+  // Handle authentication
+  socket.on('authenticate', (data) => {
+    try {
+      const jwt = require('jsonwebtoken');
+      const token = data.token;
+      const decoded = jwt.verify(token, 'CLIENT_SECRET_KEY');
+      socket.userId = decoded.id;
+      socket.username = decoded.username;
+      console.log(`User authenticated: ${socket.username} (${socket.userId})`);
+      socket.emit('authenticated');
+    } catch (error) {
+      console.error('Authentication failed:', error);
+      socket.emit('authError', { error: 'Authentication failed' });
+    }
+  });
+
   // Join a sprint room
   socket.on('joinSprint', (sprintId) => {
     socket.join(`sprint_${sprintId}`);
+    socket.sprintId = sprintId; // Store sprint ID for cleanup
     console.log(`User ${socket.id} joined sprint room: sprint_${sprintId}`);
+    
+    // Notify others in the room that a user joined
+    socket.to(`sprint_${sprintId}`).emit('userJoined', { 
+      userId: socket.userId,
+      username: socket.username 
+    });
   });
 
   // Handle sending a message
   socket.on('sendMessage', async (data) => {
     try {
-      // Save message to database (you can reuse your sendMessage controller logic here)
+      // Save message to database
       const Message = require('./models/Message');
       const Sprint = require('./models/Sprint');
+      const sprint = await Sprint.findById(data.sprintId);
+      if (!sprint) {
+        socket.emit('messageError', { error: 'Sprint not found' });
+        return;
+      }
+      const isClosed =
+        sprint.isFinished ||
+        sprint.isActive === false ||
+        (sprint.endDate && new Date(sprint.endDate) < new Date());
+      if (isClosed) {
+        socket.emit('messageError', { error: 'Sprint has ended' });
+        return;
+      }
       
       const message = await Message.create({
         sprint: data.sprintId,
@@ -81,7 +121,7 @@ io.on('connection', (socket) => {
       await Sprint.findByIdAndUpdate(data.sprintId, { $push: { messages: message._id } });
 
       // Populate sender info
-      const populatedMessage = await Message.findById(message._id).populate('sender', 'username');
+      const populatedMessage = await Message.findById(message._id).populate('sender', 'username email');
 
       // Broadcast the message to all users in the sprint room
       io.to(`sprint_${data.sprintId}`).emit('newMessage', populatedMessage);
@@ -91,9 +131,62 @@ io.on('connection', (socket) => {
     }
   });
 
+  // Handle sending direct message
+  socket.on('sendDirectMessage', async (data) => {
+    try {
+      const DirectMessage = require('./models/DirectMessage');
+      const Conversation = require('./models/Conversation');
+      
+      // Create message
+      const message = await DirectMessage.create({
+        conversation: data.conversationId,
+        sender: data.senderId,
+        recipient: data.recipientId,
+        text: data.text,
+        timestamp: new Date()
+      });
+
+      // Update conversation's last message
+      await Conversation.findByIdAndUpdate(data.conversationId, {
+        lastMessage: message._id,
+        lastMessageTime: message.timestamp
+      });
+
+      // Populate message data
+      await message.populate([
+        { path: 'sender', select: 'username email' },
+        { path: 'recipient', select: 'username email' }
+      ]);
+
+      // Send to sender (for confirmation)
+      socket.emit('directMessageSent', message);
+
+      // Send to recipient
+      socket.to(`user_${data.recipientId}`).emit('newDirectMessage', message);
+
+    } catch (error) {
+      console.error('Error sending direct message:', error);
+      socket.emit('directMessageError', { error: 'Failed to send message' });
+    }
+  });
+
+  // Handle joining user room for direct messages
+  socket.on('joinUserRoom', (userId) => {
+    socket.join(`user_${userId}`);
+    console.log(`User ${socket.id} joined user room: user_${userId}`);
+  });
+
   // Handle disconnection
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
+    
+    // Notify others in the sprint room that user left
+    if (socket.sprintId) {
+      socket.to(`sprint_${socket.sprintId}`).emit('userLeft', { 
+        userId: socket.userId,
+        username: socket.username 
+      });
+    }
   });
 });
 

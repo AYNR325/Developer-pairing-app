@@ -6,12 +6,13 @@ const taskSchema = new mongoose.Schema({
     description: String,
   
     status: { type: String, enum: ['To Do', 'In Progress', 'Done'], default: 'To Do' },
-    assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    // Multiple members can be assigned to a task
+    assignedMembers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   
     comments: [{
       user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
       text: String,
-      timestamp: Date
+      timestamp: { type: Date, default: Date.now }
     }]
   }, { timestamps: true });
   

@@ -1,7 +1,11 @@
-const User = require('../models/User');
-const ConnectionRequest = require('../models/ConnectionRequest');
+const User = require("../models/User");
+const ConnectionRequest = require("../models/ConnectionRequest");
+const {
+  getDeveloperMatchesForUser,
+  getSprintMatchesForUser,
+} = require("../services/ai-match-service");
 
-// Helper: Calculate match score
+// Helper: Calculate match score (existing rule-based search)
 function calculateMatchScore(user, filters) {
   let score = 0;
   const maxScore = 100;
@@ -37,14 +41,14 @@ function calculateMatchScore(user, filters) {
   return Math.min(maxScore, score);
 }
 
-// Search for matching developers based on filters and ranking
+// Search for matching developers based on filters and ranking (existing endpoint)
 exports.searchDevelopers = async (req, res) => {
   try {
     const { experienceYear, preferredLanguages, availability, userId, name } = req.query;
     
     // If searching by name, ignore filters and only search by username
     if (name && name.trim()) {
-      const nameRegex = new RegExp(name.trim(), 'i'); // case-insensitive, partial match
+      const nameRegex = new RegExp(name.trim(), "i"); // case-insensitive, partial match
       const users = await User.find({
         _id: { $ne: userId },
         username: { $regex: nameRegex }
@@ -61,7 +65,7 @@ exports.searchDevelopers = async (req, res) => {
         
         return {
           ...user,
-          connectionStatus: connection ? connection.status : 'none'
+          connectionStatus: connection ? connection.status : "none",
         };
       }));
 
@@ -79,7 +83,7 @@ exports.searchDevelopers = async (req, res) => {
       preferredLanguages: preferredLanguages ? 
         (Array.isArray(preferredLanguages) ? preferredLanguages : [preferredLanguages]) : 
         [],
-      availability: availability || null
+      availability: availability || null,
     };
 
     // First, find all users with matching languages
@@ -87,7 +91,7 @@ exports.searchDevelopers = async (req, res) => {
     if (filters.preferredLanguages && filters.preferredLanguages.length > 0) {
       users = await User.find({
         _id: { $ne: userId },
-        preferredLanguages: { $in: filters.preferredLanguages }
+        preferredLanguages: { $in: filters.preferredLanguages },
       }).lean();
 
       // If no users found with matching languages, return empty result
@@ -106,57 +110,157 @@ exports.searchDevelopers = async (req, res) => {
 
     // Filter by experience if specified
     if (filters.experienceYear) {
-      users = users.filter(user => 
+      users = users.filter((user) =>
         user.experienceYear >= Math.max(0, filters.experienceYear - 2) && 
         user.experienceYear <= filters.experienceYear + 2
       );
     }
 
     // Calculate match scores and add connection status
-    const ranked = await Promise.all(users
-      .map(u => ({ 
+    const ranked = await Promise.all(
+      users
+        .map((u) => ({
         ...u, 
         matchScore: calculateMatchScore(u, filters),
-        matchingLanguages: filters.preferredLanguages && filters.preferredLanguages.length > 0 ?
-          u.preferredLanguages.filter(lang => filters.preferredLanguages.includes(lang)) :
-          []
+          matchingLanguages:
+            filters.preferredLanguages && filters.preferredLanguages.length > 0
+              ? u.preferredLanguages.filter((lang) =>
+                  filters.preferredLanguages.includes(lang)
+                )
+              : [],
       }))
-      .filter(u => u.matchScore > 20) // Only show matches with score > 20%
+        .filter((u) => u.matchScore > 20) // Only show matches with score > 20%
       .sort((a, b) => {
         // First sort by number of matching languages
-        const langDiff = b.matchingLanguages.length - a.matchingLanguages.length;
+          const langDiff =
+            b.matchingLanguages.length - a.matchingLanguages.length;
         if (langDiff !== 0) return langDiff;
         // Then by match score
         return b.matchScore - a.matchScore;
-      }));
+        })
+    );
 
     // Get connection status for each user
-    const rankedWithStatus = await Promise.all(ranked.map(async (user) => {
+    const rankedWithStatus = await Promise.all(
+      ranked.map(async (user) => {
       const connection = await ConnectionRequest.findOne({
         $or: [
           { fromUser: userId, toUser: user._id },
-          { fromUser: user._id, toUser: userId }
-        ]
+            { fromUser: user._id, toUser: userId },
+          ],
       });
       
       return {
         ...user,
-        connectionStatus: connection ? connection.status : 'none'
+          connectionStatus: connection ? connection.status : "none",
       };
-    }));
+      })
+    );
 
     res.json({ 
       success: true, 
       users: rankedWithStatus,
       filters: filters,
-      message: ranked.length > 0 ? 'Found matching developers' : 'No matching developers found'
+      message:
+        ranked.length > 0
+          ? "Found matching developers"
+          : "No matching developers found",
     });
   } catch (err) {
-    console.error('Search error:', err);
+    console.error("Search error:", err);
     res.status(500).json({ 
       success: false, 
       error: err.message,
       message: 'Error occurred while searching for developers'
+    });
+  }
+};
+
+// --- New: AI-powered developer partner recommendations using Gemini embeddings ---
+exports.getAIDeveloperMatches = async (req, res) => {
+  try {
+    const { userId } = req.query;
+    if (!userId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "userId query param is required" });
+    }
+
+    const matches = await getDeveloperMatchesForUser(userId);
+
+    return res.json({
+      success: true,
+      message:
+        matches.length > 0
+          ? "AI developer matches generated successfully"
+          : "No suitable developer matches found",
+      matches,
+    });
+  } catch (err) {
+    console.error("AI developer match error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Error occurred while generating AI developer matches",
+      error: err.message,
+    });
+  }
+};
+
+// --- New: AI-powered sprint recommendations using Gemini embeddings ---
+exports.getAISprintMatches = async (req, res) => {
+  try {
+    const { userId } = req.query;
+    if (!userId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "userId query param is required" });
+    }
+
+    const matches = await getSprintMatchesForUser(userId);
+
+    return res.json({
+      success: true,
+      message:
+        matches.length > 0
+          ? "AI sprint matches generated successfully"
+          : "No suitable sprint matches found",
+      matches,
+    });
+  } catch (err) {
+    console.error("AI sprint match error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Error occurred while generating AI sprint matches",
+      error: err.message,
+    });
+  }
+};
+
+// --- Helper: Get all users (for testing - to get userIds) ---
+exports.getAllUsersForTesting = async (req, res) => {
+  try {
+    const users = await User.find({})
+      .select("_id username email experienceLevel preferredLanguages additionalSkills")
+      .lean();
+
+    return res.json({
+      success: true,
+      message: `Found ${users.length} users`,
+      users: users.map((u) => ({
+        userId: u._id,
+        username: u.username,
+        email: u.email,
+        experienceLevel: u.experienceLevel,
+        preferredLanguages: u.preferredLanguages,
+        additionalSkills: u.additionalSkills,
+      })),
+    });
+  } catch (err) {
+    console.error("Get users error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching users",
+      error: err.message,
     });
   }
 };
@@ -358,6 +462,74 @@ exports.rejectConnectionRequest = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error rejecting connection request'
+    });
+  }
+};
+
+// Get sent connection requests for a user
+exports.getSentRequests = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const requests = await ConnectionRequest.find({
+      fromUser: userId,
+      status: 'pending'
+    }).populate('toUser', 'username profilePicture experienceYear preferredLanguages availability');
+
+    res.json({
+      success: true,
+      requests
+    });
+  } catch (err) {
+    console.error('Error fetching sent requests:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching sent requests'
+    });
+  }
+};
+
+// Cancel a sent connection request
+exports.cancelConnectionRequest = async (req, res) => {
+  try {
+    const { requestId } = req.params;
+    const { userId } = req.body; // The user canceling the request
+
+    const request = await ConnectionRequest.findById(requestId);
+
+    if (!request) {
+      return res.status(404).json({
+        success: false,
+        message: 'Connection request not found'
+      });
+    }
+
+    if (request.fromUser.toString() !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to cancel this request'
+      });
+    }
+
+    if (request.status !== 'pending') {
+      return res.status(400).json({
+        success: false,
+        message: 'Request is no longer pending'
+      });
+    }
+
+    // Delete the request
+    await ConnectionRequest.findByIdAndDelete(requestId);
+
+    res.json({
+      success: true,
+      message: 'Connection request canceled'
+    });
+  } catch (err) {
+    console.error('Error canceling connection request:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Error canceling connection request'
     });
   }
 };

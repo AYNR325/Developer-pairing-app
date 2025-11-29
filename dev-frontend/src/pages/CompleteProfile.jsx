@@ -57,7 +57,7 @@ function CompleteProfile() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/auth/check-auth', {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/check-auth`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         
@@ -210,7 +210,7 @@ function CompleteProfile() {
         profilePicture: photoPreview ? photoPreview.split(',')[1] : null // Remove the data URL prefix
       };
 
-      const response = await axios.put("http://localhost:3000/api/auth/complete-profile", submitData, {
+      const response = await axios.put(`${import.meta.env.VITE_API_URL}/api/auth/complete-profile`, submitData, {
         headers: { 
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'

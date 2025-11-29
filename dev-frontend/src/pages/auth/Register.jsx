@@ -14,7 +14,7 @@ function Register() {
   const onSubmit = async (data) => {
     try {
       setIsLoading(true);
-      const res = await axios.post("http://localhost:3000/api/auth/register", data);
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/register`, data);
       if(res?.data?.success){
         // alert("Registration successful");
         toast.success('Registration successful', {
