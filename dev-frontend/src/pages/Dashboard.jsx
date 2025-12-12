@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { useUser } from "@/context/UserContext";
-
+import Sidebar from "@/components/Sidebar";
+import Navbar from "@/components/Navbar";
 function Dashboard() {
   const { userData, loading } = useUser();
   const [sprints, setSprints] = useState([]);
@@ -93,205 +94,16 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header - Made Sticky */}
+      <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} userData={userData} />
 
-      <header className="bg-black border-b-2 border-[#FF96F5] p-3 sm:p-4 fixed top-0 left-0 right-0 z-50">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            {/* Hamburger Menu Button - Mobile Only */}
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden w-10 h-10 flex items-center justify-center text-white hover:bg-gray-800 rounded-lg transition-colors"
-              aria-label="Toggle menu"
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                {sidebarOpen ? (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                ) : (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                )}
-              </svg>
-            </button>
-            <span className="bg-gradient-to-r from-[#8D2B7E] via-[#FF96F5] to-[#A259C6] bg-clip-text text-transparent text-2xl sm:text-3xl font-bold drop-shadow-[0_2px_8px_rgba(141,43,126,0.25)] animate-gradient-x select-none">
-              &lt;/&gt;
-            </span>
-            <span className="ml-2 relative text-2xl sm:text-3xl font-extrabold  tracking-wide select-none">
-              <span className="bg-gradient-to-r from-[#FF96F5] via-[#8D2B7E] to-[#A259C6] bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(255,150,245,0.15)] animate-gradient-x">
-                Dev
-              </span>
-              <span className="bg-gradient-to-r from-[#A259C6] to-[#FF96F5] bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(162,89,198,0.17)] animate-gradient-x">
-                Hub
-              </span>
-              <span className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-[#FF96F5]/50 via-[#8D2B7E]/30 to-transparent rounded-full blur-sm opacity-80 pointer-events-none"></span>
-            </span>
-          </div>
-          <div className="flex items-center space-x-2 sm:space-x-4 md:space-x-8">
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex space-x-4 lg:space-x-6">
-              <Link
-                to="/dashboard"
-                className="hover:text-[#8D2B7E] text-sm lg:text-base"
-              >
-                Home
-              </Link>
-              <Link
-                to="/network"
-                className="hover:text-[#8D2B7E] text-sm lg:text-base"
-              >
-                My Network
-              </Link>
-              <Link
-                to="/chats"
-                className="hover:text-[#8D2B7E] text-sm lg:text-base"
-              >
-                Chats
-              </Link>
-            </nav>
-
-            {/* Mobile Icon Buttons - Network and Chat */}
-            <div className="flex items-center gap-2 md:hidden">
-              {/* Network Icon */}
-              <Link
-                to="/network"
-                className="w-9 h-9 flex items-center justify-center text-white hover:bg-gray-800 rounded-lg transition-colors"
-                aria-label="My Network"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                  />
-                </svg>
-              </Link>
-
-              {/* Chat Icon */}
-              <Link
-                to="/chats"
-                className="w-9 h-9 flex items-center justify-center text-white hover:bg-gray-800 rounded-lg transition-colors"
-                aria-label="Chats"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                  />
-                </svg>
-              </Link>
-            </div>
-
-            {/* Profile Picture */}
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#8D2B7E] rounded-full overflow-hidden flex items-center justify-center">
-              {userData?.profilePicture ? (
-                <img
-                  src={`data:image/jpeg;base64,${userData.profilePicture}`}
-                  alt="Profile"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span className="text-white text-sm sm:text-lg font-semibold">
-                  {userData?.username?.charAt(0)?.toUpperCase() || "U"}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Mobile Overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
 
       <div className="flex pt-[60px] sm:pt-[73px]">
         {/* Sidebar - Made Sticky */}
-        <aside
-          className={`w-64 bg-[#8D2B7E] fixed left-0 top-[60px] sm:top-[73px] bottom-0 flex flex-col z-50 transform transition-transform duration-300 ease-in-out ${
-            sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-          }`}
-        >
-          <nav className="p-4 space-y-4 flex-grow">
-            <Link
-              to="/dashboard"
-              onClick={() => setSidebarOpen(false)}
-              className="block py-2 px-4 bg-[#8D2B7E] text-white rounded"
-            >
-              Dashboard
-            </Link>
-            <Link
-              to="/search"
-              onClick={() => setSidebarOpen(false)}
-              className="block py-2 px-4 hover:bg-[#8D2B7E]/80 text-white rounded"
-            >
-              Search Developers
-            </Link>
-            <Link
-              to="/join-sprint"
-              onClick={() => setSidebarOpen(false)}
-              className="block py-2 px-4 hover:bg-[#8D2B7E]/80 text-white rounded"
-            >
-              Join Sprint
-            </Link>
-            <Link
-              to="/create-sprint"
-              onClick={() => setSidebarOpen(false)}
-              className="block py-2 px-4 hover:bg-[#8D2B7E]/80 text-white rounded"
-            >
-              Create Sprint
-            </Link>
-          </nav>
-          {/* Sign Out Button */}
-          <div className="p-4 border-t border-[#8D2B7E]/20">
-            <button
-              onClick={handleSignOut}
-              className="w-full py-2 px-4 bg-[#111] text-white rounded hover:bg-[#222] transition-colors flex items-center justify-center gap-2"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1H3zm11 4.414l-4.293 4.293a1 1 0 01-1.414 0L4 7.414 5.414 6l3.293 3.293L12 6l2 1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              Sign Out
-            </button>
-          </div>
-        </aside>
+        <Sidebar 
+          isOpen={sidebarOpen} 
+          onClose={() => setSidebarOpen(false)} 
+          onSignOut={handleSignOut} 
+        />
 
         {/* Main Content - Added margin-left to account for fixed sidebar */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 lg:ml-64">

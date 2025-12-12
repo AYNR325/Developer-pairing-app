@@ -109,7 +109,13 @@ function SprintHome() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col lg:flex-row">
+    <div className="h-screen bg-black flex flex-col lg:flex-row relative overflow-hidden font-sans selection:bg-[#FF96F5] selection:text-black">
+      {/* Background decoration - matching Landing Page */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+          <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#8D2B7E]/20 rounded-full blur-[120px]"></div>
+          <div className="absolute bottom-[10%] right-[-5%] w-[600px] h-[600px] bg-[#2D033B]/40 rounded-full blur-[120px]"></div>
+      </div>
+
       <ToastContainer
       position="top-center"
       autoClose={5000}
@@ -124,25 +130,25 @@ function SprintHome() {
       {/* Mobile/Tablet Overlay */}
       {sidebarOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden backdrop-blur-sm"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar - Hidden on mobile/tablet, visible on desktop */}
-      <div className={`fixed lg:relative left-0 top-0 bottom-0 transform transition-transform duration-300 ease-in-out z-50 lg:z-auto ${
+      <div className={`fixed lg:relative left-0 top-0 bottom-0 h-full transform transition-transform duration-300 ease-in-out z-50 lg:z-auto ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       }`}>
         <SprintSidebar onNavigate={() => setSidebarOpen(false)} />
       </div>
       
       {/* Main Content */}
-      <div className="flex-1 p-4 sm:p-6 w-full lg:w-auto">
+      <div className="flex-1 p-4 sm:p-6 w-full lg:w-auto relative z-10 overflow-y-auto custom-scrollbar">
         {/* Mobile/Tablet Header with Hamburger */}
-        <div className="lg:hidden mb-4 flex items-center gap-3">
+        <div className="lg:hidden mb-6 flex items-center gap-3">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="w-10 h-10 flex items-center justify-center text-white hover:bg-gray-800 rounded-lg transition-colors z-50 relative"
+            className="w-10 h-10 flex items-center justify-center text-white hover:bg-white/10 rounded-lg transition-colors z-50 relative border border-white/10"
             aria-label="Toggle menu"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -153,135 +159,149 @@ function SprintHome() {
               )}
             </svg>
           </button>
-          <h1 className="text-xl font-bold text-white">Sprint Home</h1>
+          <h1 className="text-xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">Sprint Home</h1>
           <button
             onClick={() => navigate("/dashboard")}
-            className="ml-auto bg-[#8D2B7E] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-[#A259C6] transition-colors text-xs sm:text-sm lg:hidden"
+            className="ml-auto bg-gradient-to-r from-[#8D2B7E] to-[#A259C6] text-white px-4 py-2 rounded-lg hover:shadow-[0_0_15px_rgba(141,43,126,0.5)] transition-all text-xs sm:text-sm lg:hidden font-medium"
           >
             Back
           </button>
         </div>
-        {/* Debug Info - Remove in production */}
-        {/* <div className="mb-4 p-3 bg-gray-800 rounded-lg text-sm">
-          <p className="text-white">Debug Info:</p>
-          <p className="text-gray-300">User ID: {userData?._id}</p>
-          <p className="text-gray-300">Creator ID: {sprintInfo?.creator?._id}</p>
-          <p className="text-gray-300">Is Owner: {isOwner ? "Yes" : "No"}</p>
-        </div> */}
         
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           {/* Sprint Info Card */}
-          <div className="bg-[#2D033B] rounded-lg p-4 sm:p-6 col-span-1">
-            <div className="flex flex-col sm:flex-row justify-between items-start mb-4 gap-3">
-              <h2 className="text-white font-bold text-lg sm:text-xl">Sprint Info</h2>
-              <button className="bg-[#8D2B7E] text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-[#A259C6] transition-colors text-sm sm:text-base w-full sm:w-auto">
+          <div className="bg-[#1a1a1a]/40 backdrop-blur-xl border border-[#8D2B7E]/20 rounded-2xl p-4 sm:p-6 col-span-1 shadow-[0_0_20px_rgba(0,0,0,0.2)] hover:border-[#8D2B7E]/40 transition-colors">
+            <div className="flex flex-col sm:flex-row justify-between items-start mb-6 gap-3">
+              <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">Sprint Info</h2>
+              <button className="bg-gradient-to-r from-[#8D2B7E] to-[#A259C6] text-white px-4 py-2 rounded-lg hover:shadow-[0_0_15px_rgba(141,43,126,0.5)] transition-all text-sm sm:text-base w-full sm:w-auto font-medium">
                 Invite Link
               </button>
             </div>
             {sprintInfo && (
-              <div className="space-y-2.5 sm:space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300 text-sm sm:text-base">Duration:</span>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center p-3 bg-white/5 rounded-xl border border-white/5">
+                  <span className="text-gray-400 text-sm sm:text-base">Duration:</span>
                   <span className="text-white font-medium text-sm sm:text-base">{sprintInfo.duration || "N/A"}</span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300 text-sm sm:text-base">Start Date:</span>
+                <div className="flex justify-between items-center p-3 bg-white/5 rounded-xl border border-white/5">
+                  <span className="text-gray-400 text-sm sm:text-base">Start Date:</span>
                   <span className="text-white font-medium text-sm sm:text-base">
                     {sprintInfo.startDate ? new Date(sprintInfo.startDate).toLocaleDateString() : "N/A"}
                   </span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300 text-sm sm:text-base">Countdown Timer:</span>
-                  <span className="text-[#8D2B7E] font-bold text-sm sm:text-base">{getCountdownTimer()}</span>
+                <div className="flex justify-between items-center p-3 bg-white/5 rounded-xl border border-white/5">
+                  <span className="text-gray-400 text-sm sm:text-base">Countdown:</span>
+                  <span className="text-[#FF96F5] font-bold text-sm sm:text-base animate-pulse">{getCountdownTimer()}</span>
                 </div>
-                <div className="flex justify-between items-center flex-wrap gap-1">
-                  <span className="text-gray-300 text-sm sm:text-base">Tech Stack:</span>
-                  <span className="text-white font-medium text-xs sm:text-base text-right">{sprintInfo.techStack.join(", ") || "N/A"}</span>
+                <div className="flex justify-between items-center flex-wrap gap-2 p-3 bg-white/5 rounded-xl border border-white/5">
+                  <span className="text-gray-400 text-sm sm:text-base">Tech Stack:</span>
+                  <div className="flex flex-wrap gap-1 justify-end">
+                    {sprintInfo.techStack.length > 0 ? (
+                      sprintInfo.techStack.map((tech, i) => (
+                        <span key={i} className="text-xs bg-[#2D033B] text-[#FF96F5] px-2 py-1 rounded-md border border-[#8D2B7E]/30">
+                          {tech}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-white font-medium text-xs sm:text-base">N/A</span>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
           </div>
 
           {/* Team List Card */}
-          <div className="bg-[#2D033B] rounded-lg p-4 sm:p-6 col-span-1">
-            <div className="flex justify-between items-start mb-3 sm:mb-4">
-              <h2 className="text-white font-bold text-lg sm:text-xl">Team List</h2>
-              <Link to={`/sprint/${sprintId}/teams`} className="text-[#8D2B7E] hover:text-[#A259C6] text-sm">
-                View More &gt;&gt;
+          <div className="bg-[#1a1a1a]/40 backdrop-blur-xl border border-[#8D2B7E]/20 rounded-2xl p-4 sm:p-6 col-span-1 shadow-[0_0_20px_rgba(0,0,0,0.2)] hover:border-[#8D2B7E]/40 transition-colors">
+            <div className="flex justify-between items-start mb-6 w-full">
+              <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">Team List</h2>
+              <Link to={`/sprint/${sprintId}/teams`} className="text-[#FF96F5] hover:text-white transition-colors text-sm font-medium flex items-center gap-1">
+                View More <span className="transform group-hover:translate-x-1 transition-transform">→</span>
               </Link>
             </div>
             {sprintInfo?.teamMembers?.length > 0 ? (
-              <div className="space-y-2.5 sm:space-y-3">
+              <div className="space-y-3">
                 {sprintInfo.teamMembers.slice(0, 3).map((member) => (
-                  <div key={member._id} className="flex justify-between items-center">
+                  <div key={member._id} className="flex justify-between items-center p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors group">
                     <Link 
                       to={`/user/${member._id}`}
-                      className="text-white hover:text-[#8D2B7E] transition-colors text-sm sm:text-base"
+                      className="flex items-center gap-3"
                     >
-                      {member.username}
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#8D2B7E] to-[#2D033B] flex items-center justify-center text-xs font-bold ring-2 ring-[#8D2B7E]/30 group-hover:ring-[#FF96F5] transition-all">
+                         {member.username?.charAt(0)?.toUpperCase()}
+                      </div>
+                      <span className="text-white hover:text-[#FF96F5] transition-colors text-sm sm:text-base font-medium">
+                        {member.username}
+                      </span>
                     </Link>
-                    <span className="text-[#8D2B7E] text-xs sm:text-sm">
-                      {member.role || "Member"}
+                    <span className={`text-xs sm:text-sm px-2 py-1 rounded-full border ${
+                      ((sprintInfo.creator?._id || sprintInfo.creator)?.toString() === member._id?.toString())
+                        ? "text-yellow-400 bg-yellow-400/10 border-yellow-400/20" 
+                        : "text-[#FF96F5]/80 bg-[#FF96F5]/10 border-[#FF96F5]/20"
+                    }`}>
+                      {((sprintInfo.creator?._id || sprintInfo.creator)?.toString() === member._id?.toString()) ? "Owner" : (member.role || "Member")}
                     </span>
                   </div>
                 ))}
                 {sprintInfo.teamMembers.length > 3 && (
-                  <p className="text-gray-400 text-xs sm:text-sm">
+                  <p className="text-gray-400 text-xs sm:text-sm text-center pt-2">
                     +{sprintInfo.teamMembers.length - 3} more members
                   </p>
                 )}
               </div>
             ) : (
-              <p className="text-gray-400 text-sm sm:text-base">No team members yet</p>
+              <div className="flex flex-col items-center justify-center py-8 text-gray-500">
+                 <p className="text-sm">No team members yet</p>
+              </div>
             )}
           </div>
 
           {/* Description Card */}
-          <div className="bg-[#2D033B] rounded-lg p-4 sm:p-6 col-span-1 sm:col-span-2">
-            <h2 className="text-white font-bold text-lg sm:text-xl mb-3 sm:mb-4">Description</h2>
-            <div className="bg-gray-800/30 rounded-lg p-3 sm:p-4 min-h-[80px] sm:min-h-[100px]">
+          <div className="bg-[#1a1a1a]/40 backdrop-blur-xl border border-[#8D2B7E]/20 rounded-2xl p-4 sm:p-6 col-span-1 sm:col-span-2 shadow-[0_0_20px_rgba(0,0,0,0.2)]">
+            <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">Description</h2>
+            <div className="bg-black/20 rounded-xl p-4 sm:p-6 min-h-[80px] sm:min-h-[100px] border border-white/5">
               {sprintInfo?.description ? (
-                <p className="text-white text-sm sm:text-base">{sprintInfo.description}</p>
+                <p className="text-gray-200 text-sm sm:text-base leading-relaxed">{sprintInfo.description}</p>
               ) : (
-                <p className="text-gray-400 italic text-sm sm:text-base">No description provided</p>
+                <p className="text-gray-500 italic text-sm sm:text-base">No description provided</p>
               )}
             </div>
           </div>
 
           {/* Requests Card - Only show to sprint owner */}
           {isOwner && (
-            <div className="bg-[#2D033B] rounded-lg p-4 sm:p-6 col-span-1 sm:col-span-2">
-              <h2 className="text-white font-bold text-lg sm:text-xl mb-3 sm:mb-4">Requests</h2>
+            <div className="bg-[#1a1a1a]/40 backdrop-blur-xl border border-[#8D2B7E]/20 rounded-2xl p-4 sm:p-6 col-span-1 sm:col-span-2 shadow-[0_0_20px_rgba(0,0,0,0.2)]">
+              <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">Requests</h2>
               {requests.length > 0 ? (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {requests.map((req) => (
-                    <div key={req._id} className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 sm:p-4 bg-gray-800/50 rounded-lg">
-                      <div className="flex items-center gap-2 sm:gap-3">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-orange-400 rounded-full flex items-center justify-center flex-shrink-0">
-                          <span className="text-white font-bold text-xs sm:text-sm">
+                    <div key={req._id} className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 p-4 bg-white/5 rounded-xl border border-white/5 hover:border-[#8D2B7E]/30 transition-all">
+                      <div className="flex items-center gap-3 sm:gap-4">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
+                          <span className="text-white font-bold text-sm sm:text-base">
                             {req.user.username?.charAt(0)?.toUpperCase()}
                           </span>
                         </div>
                         <div className="min-w-0 flex-1">
                           <Link 
                             to={`/user/${req.user._id}`}
-                            className="text-white hover:text-[#8D2B7E] transition-colors font-medium text-sm sm:text-base block truncate"
+                            className="text-white hover:text-[#FF96F5] transition-colors font-bold text-base block truncate"
                           >
                             {req.user.username}
                           </Link>
-                          <p className="text-gray-400 text-xs sm:text-sm line-clamp-2 mt-0.5">{req.message}</p>
+                          <p className="text-gray-400 text-xs sm:text-sm line-clamp-2 mt-1">{req.message}</p>
                         </div>
                       </div>
                       <div className="flex gap-2 w-full sm:w-auto">
                         <button 
                           onClick={() => handleJoinRequest(req._id, "rejected")} 
-                          className="bg-transparent border border-gray-500 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors text-xs sm:text-sm flex-1 sm:flex-initial"
+                          className="bg-transparent border border-gray-600 text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-800 hover:text-white transition-all text-xs sm:text-sm flex-1 sm:flex-initial font-medium"
                         >
                           Ignore
                         </button>
                         <button 
                           onClick={() => handleJoinRequest(req._id, "accepted")} 
-                          className="bg-[#8D2B7E] text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-[#A259C6] transition-colors text-xs sm:text-sm flex-1 sm:flex-initial"
+                          className="bg-gradient-to-r from-[#8D2B7E] to-[#A259C6] text-white px-4 py-2 rounded-lg hover:shadow-[0_0_15px_rgba(141,43,126,0.5)] transition-all text-xs sm:text-sm flex-1 sm:flex-initial font-bold"
                         >
                           Accept
                         </button>
@@ -290,19 +310,21 @@ function SprintHome() {
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-400 text-center py-4 text-sm sm:text-base">No pending requests</p>
+                <div className="flex flex-col items-center justify-center py-8 text-gray-500 bg-white/5 rounded-xl border border-dashed border-gray-700">
+                  <p className="text-sm">No pending requests</p>
+                </div>
               )}
             </div>
           )}
 
           {/* Resources Card */}
-          <div className="bg-[#2D033B] rounded-lg p-4 sm:p-6 col-span-1 sm:col-span-2">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
-              <h2 className="text-white font-bold text-lg sm:text-xl">Resources</h2>
+          <div className="bg-[#1a1a1a]/40 backdrop-blur-xl border border-[#8D2B7E]/20 rounded-2xl p-4 sm:p-6 col-span-1 sm:col-span-2 shadow-[0_0_20px_rgba(0,0,0,0.2)]">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
+              <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">Resources</h2>
               {/* Only show edit button to sprint owner */}
               {isOwner && (
                 <button
-                  className="text-[#8D2B7E] hover:text-[#A259C6] transition-colors font-medium"
+                  className="text-[#FF96F5] hover:text-white transition-colors font-medium border border-[#FF96F5]/30 hover:bg-[#FF96F5]/10 px-3 py-1.5 rounded-lg text-sm"
                   onClick={() => {
                     setEditResources({
                       github: sprintInfo?.resources?.github || "",
@@ -315,18 +337,18 @@ function SprintHome() {
                     setIsEditingResources(true);
                   }}
                 >
-                  + Edit
+                  + Edit Resources
                 </button>
               )}
             </div>
             {!isEditingResources ? (
-              <div className="space-y-2.5 sm:space-y-3">
+              <div className="space-y-3">
                 {sprintInfo?.resources?.github && (
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-3">
-                    <span className="text-gray-300 text-sm sm:text-base">Github Repo:</span>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
+                    <span className="text-gray-400 text-sm sm:text-base min-w-[100px]">Github Repo:</span>
                     <a 
                       href={sprintInfo.resources.github} 
-                      className="text-blue-400 hover:underline text-xs sm:text-sm break-all" 
+                      className="text-[#FF96F5] hover:underline text-xs sm:text-sm break-all font-medium" 
                       target="_blank" 
                       rel="noopener noreferrer"
                     >
@@ -335,11 +357,11 @@ function SprintHome() {
                   </div>
                 )}
                 {sprintInfo?.resources?.figma && (
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-3">
-                    <span className="text-gray-300 text-sm sm:text-base">Figma Design:</span>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
+                    <span className="text-gray-400 text-sm sm:text-base min-w-[100px]">Figma Design:</span>
                     <a 
                       href={sprintInfo.resources.figma} 
-                      className="text-blue-400 hover:underline text-xs sm:text-sm break-all" 
+                      className="text-[#FF96F5] hover:underline text-xs sm:text-sm break-all font-medium" 
                       target="_blank" 
                       rel="noopener noreferrer"
                     >
@@ -348,11 +370,11 @@ function SprintHome() {
                   </div>
                 )}
                 {sprintInfo?.resources?.docs && (
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-3">
-                    <span className="text-gray-300 text-sm sm:text-base">Docs:</span>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
+                    <span className="text-gray-400 text-sm sm:text-base min-w-[100px]">Docs:</span>
                     <a 
                       href={sprintInfo.resources.docs} 
-                      className="text-blue-400 hover:underline text-xs sm:text-sm break-all" 
+                      className="text-[#FF96F5] hover:underline text-xs sm:text-sm break-all font-medium" 
                       target="_blank" 
                       rel="noopener noreferrer"
                     >
@@ -362,11 +384,11 @@ function SprintHome() {
                 )}
                 {sprintInfo?.resources?.extraLinks?.length > 0 &&
                   sprintInfo.resources.extraLinks.map((link, idx) => (
-                    <div key={idx} className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-3">
-                      <span className="text-gray-300 text-sm sm:text-base">Extra Link:</span>
+                    <div key={idx} className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
+                      <span className="text-gray-400 text-sm sm:text-base min-w-[100px]">Extra Link:</span>
                       <a 
                         href={link} 
-                        className="text-blue-400 hover:underline text-xs sm:text-sm break-all" 
+                        className="text-[#FF96F5] hover:underline text-xs sm:text-sm break-all font-medium" 
                         target="_blank" 
                         rel="noopener noreferrer"
                       >
@@ -378,7 +400,9 @@ function SprintHome() {
                   !sprintInfo?.resources?.figma &&
                   !sprintInfo?.resources?.docs &&
                   (!sprintInfo?.resources?.extraLinks || sprintInfo.resources.extraLinks.length === 0) && (
-                    <p className="text-gray-400 text-center py-4 text-sm sm:text-base">No resources added yet</p>
+                    <div className="flex flex-col items-center justify-center py-8 text-gray-500 bg-white/5 rounded-xl border border-dashed border-gray-700">
+                      <p className="text-sm">No resources added yet</p>
+                    </div>
                   )}
               </div>
             ) : (

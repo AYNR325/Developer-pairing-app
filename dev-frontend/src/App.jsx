@@ -5,6 +5,7 @@ import './App.css'
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+import LandingPage from "./pages/LandingPage";
 import CompleteProfile from './pages/CompleteProfile';
 import Dashboard from './pages/Dashboard';
 import Search from './pages/Search';
@@ -28,8 +29,8 @@ function App() {
     <>
       <UserProvider>
         <Routes>
-          {/* Root route - redirect to register for unauthenticated, dashboard for authenticated */}
-          <Route path='/' element={<Navigate to='/auth/register' replace />} />
+          {/* Root route - Landing Page */}
+          <Route path='/' element={<LandingPage />} />
           
           {/* Public Routes - Redirect authenticated users to dashboard */}
           <Route 

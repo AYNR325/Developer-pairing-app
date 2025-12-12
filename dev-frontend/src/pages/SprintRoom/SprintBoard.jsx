@@ -474,7 +474,13 @@ function SprintBoard() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col lg:flex-row">
+    <div className="h-screen bg-black flex flex-col lg:flex-row relative overflow-hidden font-sans selection:bg-[#FF96F5] selection:text-black">
+      {/* Background decoration */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+          <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#8D2B7E]/20 rounded-full blur-[120px]"></div>
+          <div className="absolute bottom-[10%] right-[-5%] w-[600px] h-[600px] bg-[#2D033B]/40 rounded-full blur-[120px]"></div>
+      </div>
+
       <ToastContainer
       position="top-center"
       autoClose={5000}
@@ -489,27 +495,27 @@ function SprintBoard() {
       {/* Mobile/Tablet Overlay */}
       {sidebarOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden backdrop-blur-sm"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar - Hidden on mobile/tablet, visible on desktop */}
-      <div className={`fixed lg:relative left-0 top-0 bottom-0 transform transition-transform duration-300 ease-in-out z-50 lg:z-auto ${
+      <div className={`fixed lg:relative left-0 top-0 bottom-0 h-full transform transition-transform duration-300 ease-in-out z-50 lg:z-auto ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       }`}>
         <SprintSidebar onNavigate={() => setSidebarOpen(false)} />
       </div>
       
       {/* Main Content */}
-      <div className="flex-1 flex flex-col w-full lg:w-auto">
+      <div className="flex-1 flex flex-col w-full lg:w-auto relative z-10 overflow-hidden">
         {/* Header */}
-        <div className="bg-black p-4 sm:p-6">
+        <div className="bg-transparent p-4 sm:p-6 lg:mb-6">
           <div className="flex items-center gap-3">
             {/* Mobile/Tablet Hamburger */}
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden w-10 h-10 flex items-center justify-center text-white hover:bg-gray-800 rounded-lg transition-colors z-50 relative"
+              className="lg:hidden w-10 h-10 flex items-center justify-center text-white hover:bg-white/10 rounded-lg transition-colors z-50 relative border border-white/10"
               aria-label="Toggle menu"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -520,10 +526,10 @@ function SprintBoard() {
                 )}
               </svg>
             </button>
-            <h1 className="text-2xl sm:text-3xl text-white font-bold">Board</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">Sprint Board</h1>
             <button
             onClick={() => navigate("/dashboard")}
-            className="ml-auto bg-[#8D2B7E] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-[#A259C6] transition-colors text-xs sm:text-sm lg:hidden"
+            className="ml-auto bg-gradient-to-r from-[#8D2B7E] to-[#A259C6] text-white px-4 py-2 rounded-lg hover:shadow-[0_0_15px_rgba(141,43,126,0.5)] transition-all text-xs sm:text-sm lg:hidden font-medium"
           >
             Back
           </button>
@@ -531,48 +537,156 @@ function SprintBoard() {
         </div>
 
         {/* Board Content */}
-        <div className="flex-1 p-3 sm:p-4 lg:p-6 overflow-x-auto">
+        <div className="flex-1 p-3 sm:p-4 lg:p-6 overflow-x-auto overflow-y-auto custom-scrollbar">
           <DragDropContext onDragEnd={handleDragEnd}>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 min-w-max lg:min-w-0">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 min-w-max lg:min-w-0">
               {["todo", "inprogress", "done"].map((col) => (
                 <Droppable droppableId={col} key={col}>
                   {(provided) => (
                     <div
                       ref={provided.innerRef}
                       {...provided.droppableProps}
-                      className="bg-[#2D033B] rounded-xl sm:rounded-xl lg:rounded-2xl p-2 sm:p-3 lg:p-4 min-h-[400px] sm:min-h-[450px] lg:min-h-[500px] w-full"
+                      className="bg-[#1a1a1a]/40 backdrop-blur-xl border border-[#8D2B7E]/20 rounded-2xl p-4 min-h-[500px] w-full flex flex-col shadow-[0_0_20px_rgba(0,0,0,0.2)]"
                     >
-                      <h2 className="text-base sm:text-lg lg:text-xl text-white font-bold mb-2 sm:mb-3 lg:mb-4">{statusMap[col]}</h2>
-                      {getTasksByStatus(col).map((task, index) => (
-                        <Draggable
-                          key={task._id}
-                          draggableId={task._id}
-                          index={index}
-                        >
-                          {(provided) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              className="bg-[#8D2B7E] rounded-lg p-2 sm:p-3 lg:p-4 mb-2 sm:mb-3 lg:mb-4 text-white relative cursor-pointer"
-                              onClick={() => setSelectedTask(task)}
-                            >
-                              {/* Task Title */}
-                              <div className="mb-1.5 sm:mb-2 lg:mb-3">
-                                {editingTaskId === task._id ? (
-                                  <div className="flex flex-col sm:flex-row gap-2">
-                                    <input
-                                      value={editTitle}
-                                      onChange={(e) => setEditTitle(e.target.value)}
-                                      className="text-black px-2 py-1 rounded flex-1 text-sm sm:text-base"
-                                    />
+                      <h2 className="text-xl text-white font-bold mb-4 flex items-center gap-2">
+                        <span className={`w-3 h-3 rounded-full ${col === 'todo' ? 'bg-gray-400' : col === 'inprogress' ? 'bg-orange-400' : 'bg-green-500'}`}></span>
+                        {statusMap[col]}
+                        <span className="ml-auto text-xs font-normal text-gray-400 bg-white/5 px-2 py-1 rounded-full">{getTasksByStatus(col).length}</span>
+                      </h2>
+                      
+                      <div className="flex-1 space-y-3">
+                        {getTasksByStatus(col).map((task, index) => (
+                          <Draggable
+                            key={task._id}
+                            draggableId={task._id}
+                            index={index}
+                          >
+                            {(provided, snapshot) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                className={`bg-[#2D033B]/80 backdrop-blur-md rounded-xl p-4 text-white relative cursor-pointer group border border-white/5 hover:border-[#8D2B7E]/50 transition-all ${snapshot.isDragging ? 'shadow-[0_0_20px_rgba(141,43,126,0.6)] scale-105 z-50 ring-2 ring-[#FF96F5]' : 'hover:shadow-lg'}`}
+                                onClick={() => setSelectedTask(task)}
+                                style={{ ...provided.draggableProps.style }}
+                              >
+                                {/* Task Title */}
+                                <div className="mb-3">
+                                  {editingTaskId === task._id ? (
+                                    <div className="flex flex-col sm:flex-row gap-2">
+                                      <input
+                                        value={editTitle}
+                                        onChange={(e) => setEditTitle(e.target.value)}
+                                        className="bg-gray-800 text-white px-3 py-1.5 rounded-lg border border-[#8D2B7E] flex-1 text-sm focus:outline-none"
+                                        autoFocus
+                                      />
+                                      <button
+                                        className="bg-green-500 text-white rounded-lg px-3 py-1 text-xs hover:bg-green-600 font-bold shadow-lg"
+                                        onClick={async (e) => {
+                                          e.stopPropagation();
+                                          try {
+                                            const res = await axios.put(
+                                              `${import.meta.env.VITE_API_URL}/api/tasks/${task._id}`,
+                                              { title: editTitle },
+                                              {
+                                                headers: {
+                                                  Authorization: `Bearer ${token}`,
+                                                },
+                                              }
+                                            );
+                                            setTasks((prev) =>
+                                              prev.map((t) =>
+                                                t._id === task._id
+                                                  ? {
+                                                      ...t,
+                                                      title: res.data.task.title,
+                                                    }
+                                                  : t
+                                              )
+                                            );
+                                            setEditingTaskId(null);
+                                          } catch (err) {
+                                            toast.error("Failed to update task");
+                                          }
+                                        }}
+                                      >
+                                        Save
+                                      </button>
+                                      <button
+                                        className="bg-gray-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-gray-700 font-bold"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setEditingTaskId(null);
+                                        }}
+                                      >
+                                        Cancel
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <h3 className="font-medium text-base sm:text-lg break-words leading-snug group-hover:text-[#FF96F5] transition-colors">{task.title}</h3>
+                                  )}
+                                </div>
+
+                                {/* Assigned Members */}
+                                <div className="flex items-center gap-2 mb-1">
+                                  <div className="flex -space-x-2">
+                                    {task.assignedMembers && task.assignedMembers.length > 0 ? (
+                                      task.assignedMembers.slice(0, 3).map((member, idx) => (
+                                        <div
+                                          key={member._id || idx}
+                                          className="w-7 h-7 bg-gradient-to-br from-[#8D2B7E] to-[#2D033B] rounded-full flex items-center justify-center text-[10px] font-bold text-white ring-2 ring-[#2D033B]"
+                                          title={member.username}
+                                        >
+                                          {member.username?.charAt(0)?.toUpperCase()}
+                                        </div>
+                                      ))
+                                    ) : (
+                                      <div className="text-xs text-gray-500 italic px-2 py-1 bg-white/5 rounded-md">Unassigned</div>
+                                    )}
+                                    {task.assignedMembers && task.assignedMembers.length > 3 && (
+                                      <div className="w-7 h-7 bg-gray-700 rounded-full flex items-center justify-center text-[10px] text-white ring-2 ring-[#2D033B]">
+                                        +{task.assignedMembers.length - 3}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {/* Menu button */}
+                                <button
+                                  className="absolute top-2 right-2 text-gray-400 hover:text-white p-1 rounded-full hover:bg-white/10 opacity-0 group-hover:opacity-100 transition-all font-bold"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setMenuOpenTaskId(
+                                      task._id === menuOpenTaskId ? null : task._id
+                                    );
+                                  }}
+                                >
+                                  ⋯
+                                </button>
+                                {menuOpenTaskId === task._id && (
+                                  <div
+                                    ref={dropdownRef}
+                                    className="absolute top-8 right-2 bg-[#2D033B] border border-[#8D2B7E]/50 text-white rounded-xl shadow-2xl z-20 min-w-[120px] overflow-hidden backdrop-blur-md"
+                                  >
                                     <button
-                                      className="bg-green-500 text-white rounded px-2 py-1 text-xs sm:text-sm"
-                                      onClick={async () => {
+                                      className="block px-4 py-2 hover:bg-[#8D2B7E]/50 w-full text-left text-sm transition-colors"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setEditingTaskId(task._id);
+                                        setEditTitle(task.title);
+                                        setMenuOpenTaskId(null);
+                                      }}
+                                    >
+                                      Edit
+                                    </button>
+                                    <button
+                                      className="block px-4 py-2 hover:bg-red-500/20 text-red-400 w-full text-left text-sm transition-colors"
+                                      onClick={async (e) => {
+                                        e.stopPropagation();
+                                        setMenuOpenTaskId(null);
                                         try {
-                                          const res = await axios.put(
+                                          await axios.delete(
                                             `${import.meta.env.VITE_API_URL}/api/tasks/${task._id}`,
-                                            { title: editTitle },
                                             {
                                               headers: {
                                                 Authorization: `Bearer ${token}`,
@@ -580,122 +694,27 @@ function SprintBoard() {
                                             }
                                           );
                                           setTasks((prev) =>
-                                            prev.map((t) =>
-                                              t._id === task._id
-                                                ? {
-                                                    ...t,
-                                                    title: res.data.task.title,
-                                                  }
-                                                : t
-                                            )
+                                            prev.filter((t) => t._id !== task._id)
                                           );
-                                          setEditingTaskId(null);
                                         } catch (err) {
-                                          // alert("Failed to update task");
-                                          toast.error("Failed to update task");
+                                          toast.error("Failed to delete task");
                                         }
                                       }}
                                     >
-                                      Save
-                                    </button>
-                                    <button
-                                      className="bg-gray-500 text-white rounded px-2 py-1 text-xs sm:text-sm"
-                                      onClick={() => setEditingTaskId(null)}
-                                    >
-                                      Cancel
+                                      Delete
                                     </button>
                                   </div>
-                                ) : (
-                                  <h3 className="font-bold text-sm sm:text-base lg:text-lg break-words">{task.title}</h3>
                                 )}
                               </div>
-
-                              {/* Assigned Members */}
-                              <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2 lg:mb-3">
-                                <span className="text-xs text-gray-300">Assigned:</span>
-                                <div className="flex gap-1">
-                                  {task.assignedMembers && task.assignedMembers.length > 0 ? (
-                                    task.assignedMembers.slice(0, 2).map((member, idx) => (
-                                      <div
-                                        key={member._id || idx}
-                                        className="w-6 h-6 sm:w-8 sm:h-8 bg-orange-400 rounded-full flex items-center justify-center text-xs font-semibold text-black"
-                                        title={member.username}
-                                      >
-                                        {member.username?.charAt(0)?.toUpperCase()}
-                                      </div>
-                                    ))
-                                  ) : (
-                                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gray-500 rounded-full flex items-center justify-center text-xs">
-                                      ?
-                                    </div>
-                                  )}
-                                  {task.assignedMembers && task.assignedMembers.length > 2 && (
-                                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gray-600 rounded-full flex items-center justify-center text-xs">
-                                      +{task.assignedMembers.length - 2}
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-
-                              {/* Menu button */}
-                              <button
-                                className="absolute top-2 right-2 text-white text-xl px-1 py-1 rounded hover:bg-[#A259C6] focus:outline-none"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setMenuOpenTaskId(
-                                    task._id === menuOpenTaskId ? null : task._id
-                                  );
-                                }}
-                              >
-                                ⋯
-                              </button>
-                              {menuOpenTaskId === task._id && (
-                                <div
-                                  ref={dropdownRef}
-                                  className="absolute top-10 right-2 bg-white text-black rounded shadow z-20 min-w-[100px] text-sm"
-                                >
-                                  <button
-                                    className="block px-3 sm:px-4 py-2 hover:bg-gray-200 w-full text-left text-xs sm:text-sm"
-                                    onClick={() => {
-                                      setEditingTaskId(task._id);
-                                      setEditTitle(task.title);
-                                      setMenuOpenTaskId(null);
-                                    }}
-                                  >
-                                    Edit
-                                  </button>
-                                  <button
-                                    className="block px-3 sm:px-4 py-2 hover:bg-gray-200 w-full text-left text-xs sm:text-sm"
-                                    onClick={async () => {
-                                      setMenuOpenTaskId(null);
-                                      try {
-                                        await axios.delete(
-                                          `${import.meta.env.VITE_API_URL}/api/tasks/${task._id}`,
-                                          {
-                                            headers: {
-                                              Authorization: `Bearer ${token}`,
-                                            },
-                                          }
-                                        );
-                                        setTasks((prev) =>
-                                          prev.filter((t) => t._id !== task._id)
-                                        );
-                                      } catch (err) {
-                                        // alert("Failed to delete task");
-                                        toast.error("Failed to delete task");
-                                      }
-                                    }}
-                                  >
-                                    Delete
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                      {provided.placeholder}
-                      <KanbanColumn onAddTask={addTask} status={col} />
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </div>
+                      
+                      <div className="mt-4 pt-4 border-t border-white/5">
+                        <KanbanColumn onAddTask={addTask} status={col} />
+                      </div>
                     </div>
                   )}
                 </Droppable>
@@ -725,19 +744,26 @@ function KanbanColumn({ onAddTask, status }) {
   
   return (
     <>
-      {showInput && (
-        <div className="bg-[#8D2B7E] rounded-lg p-2 sm:p-3 lg:p-4 mb-2 sm:mb-3 lg:mb-4 text-white">
+      {showInput ? (
+        <div className="animate-fade-in-up">
           <input
             type="text"
             value={newTask}
             onChange={(e) => setNewTask(e.target.value)}
-            placeholder="Enter task title..."
-            className="w-full p-1.5 sm:p-2 rounded text-black mb-1.5 sm:mb-2 text-xs sm:text-sm lg:text-base"
+            placeholder="What needs to be done?"
+            className="w-full p-3 bg-[#0a0a0a]/50 border border-[#8D2B7E] rounded-xl text-white mb-3 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#FF96F5]"
             autoFocus
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && newTask.trim() !== "") {
+                onAddTask(newTask, status);
+                setNewTask("");
+                setShowInput(false);
+              }
+            }}
           />
           <div className="flex gap-2">
             <button
-              className="bg-green-500 text-white rounded px-2 sm:px-3 py-1 text-xs sm:text-sm hover:bg-green-600"
+              className="bg-gradient-to-r from-[#8D2B7E] to-[#A259C6] text-white rounded-lg px-4 py-2 text-sm font-bold shadow-lg hover:shadow-[0_0_15px_rgba(141,43,126,0.5)] transition-all flex-1"
               onClick={() => {
                 if (newTask.trim() !== "") {
                   onAddTask(newTask, status);
@@ -746,10 +772,10 @@ function KanbanColumn({ onAddTask, status }) {
                 }
               }}
             >
-              Add
+              Add Card
             </button>
             <button
-              className="bg-gray-500 text-white rounded px-3 py-1 text-sm hover:bg-gray-600"
+              className="bg-transparent border border-gray-600 text-gray-300 rounded-lg px-3 py-2 text-sm hover:bg-white/5 transition-colors"
               onClick={() => {
                 setNewTask("");
                 setShowInput(false);
@@ -759,13 +785,14 @@ function KanbanColumn({ onAddTask, status }) {
             </button>
           </div>
         </div>
+      ) : (
+        <button
+          className="w-full bg-white/5 hover:bg-white/10 border border-dashed border-gray-600 hover:border-[#8D2B7E] text-gray-400 hover:text-[#FF96F5] rounded-xl px-4 py-3 transition-all font-medium text-sm flex items-center justify-center gap-2 group"
+          onClick={() => setShowInput(true)}
+        >
+          <span className="text-xl leading-none opacity-50 group-hover:opacity-100 transition-opacity">+</span> Add Task
+        </button>
       )}
-      <button
-        className="w-full bg-[#8D2B7E] text-white rounded-lg px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2 lg:py-3 mt-2 sm:mt-3 lg:mt-4 hover:bg-[#A259C6] transition-colors font-medium text-xs sm:text-sm lg:text-base"
-        onClick={() => setShowInput(true)}
-      >
-        + Add Task
-      </button>
     </>
   );
 }

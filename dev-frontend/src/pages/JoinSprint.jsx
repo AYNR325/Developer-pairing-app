@@ -290,7 +290,8 @@ import { useUser } from "@/context/UserContext";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
-
+import Sidebar from "@/components/Sidebar";
+import Navbar from "@/components/Navbar";
 function JoinSprint() {
   const [sprints, setSprints] = useState([]);
   const [joinedSprints, setJoinedSprints] = useState([]);
@@ -547,17 +548,18 @@ function JoinSprint() {
         return (
           <button
             onClick={() => handleOpenModal(sprint)}
-            className="bg-[#8D2B7E] text-white rounded-md px-3 sm:px-4 py-2 hover:bg-[#8D2B7E]/80 transition text-sm sm:text-base w-full sm:w-auto whitespace-nowrap"
+            className="bg-gradient-to-r from-[#8D2B7E] to-[#A259C6] text-white rounded-xl px-4 py-2 hover:shadow-[0_0_15px_rgba(141,43,126,0.4)] transition-all text-sm font-bold w-full sm:w-auto whitespace-nowrap"
           >
-            Join
+            Join Sprint
           </button>
         );
       case "pending":
         return (
           <button
             disabled
-            className="bg-gray-700/50 text-gray-400 border border-gray-700/50 rounded-md px-3 sm:px-4 py-2 cursor-not-allowed text-sm sm:text-base w-full sm:w-auto whitespace-nowrap"
+            className="bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded-xl px-4 py-2 cursor-not-allowed text-sm font-medium w-full sm:w-auto whitespace-nowrap flex items-center justify-center gap-2"
           >
+            <span className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></span>
             Request Sent
           </button>
         );
@@ -565,18 +567,18 @@ function JoinSprint() {
         return (
           <button
             onClick={() => navigate(`/sprint/${sprintId}/board`)}
-            className="bg-green-500/20 text-green-300 border border-green-500/50 rounded-md px-3 sm:px-4 py-2 hover:bg-green-500/30 transition text-sm sm:text-base w-full sm:w-auto whitespace-nowrap"
+            className="bg-green-500/10 text-green-400 border border-green-500/20 rounded-xl px-4 py-2 hover:bg-green-500/20 transition-all text-sm font-medium w-full sm:w-auto whitespace-nowrap flex items-center justify-center gap-2"
           >
-            Accepted - Go to Board
+             Go to Board →
           </button>
         );
       case "rejected":
         return (
           <button
             onClick={() => handleOpenModal(sprint)}
-            className="bg-[#8D2B7E] text-white rounded-md px-3 sm:px-4 py-2 hover:bg-[#8D2B7E]/80 transition text-sm sm:text-base w-full sm:w-auto whitespace-nowrap"
+            className="bg-gradient-to-r from-[#8D2B7E] to-[#A259C6] text-white rounded-xl px-4 py-2 hover:shadow-[0_0_15px_rgba(141,43,126,0.4)] transition-all text-sm font-bold w-full sm:w-auto whitespace-nowrap"
           >
-            Join
+            Join Again
           </button>
         );
       default:
@@ -618,113 +620,38 @@ function JoinSprint() {
       draggable
       pauseOnHover
       theme="dark" />
-      {/* Header - Made Sticky */}
-      <header className="bg-black border-b-2 border-[#FF96F5] p-3 sm:p-4 fixed top-0 left-0 right-0 z-50">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            {/* Hamburger Menu Button - Mobile Only */}
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden w-10 h-10 flex items-center justify-center text-white hover:bg-gray-800 rounded-lg transition-colors"
-              aria-label="Toggle menu"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                {sidebarOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
-            </button>
-            <span className="text-[#8D2B7E] text-xl sm:text-2xl">&lt;/&gt;</span>
-            <span className="text-[#8D2B7E] text-xl sm:text-2xl font-semibold">DevHub</span>
-          </div>
-          <div className="flex items-center space-x-4 sm:space-x-8">
-            <nav className="hidden md:flex space-x-4 lg:space-x-6">
-              <Link to="/dashboard" className="hover:text-[#8D2B7E] text-sm lg:text-base">Home</Link>
-              <Link to="/network" className="hover:text-[#8D2B7E] text-sm lg:text-base">My Network</Link>
-              <Link to="/chats" className="hover:text-[#8D2B7E] text-sm lg:text-base">Chats</Link>
-            </nav>
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#8D2B7E] rounded-full overflow-hidden flex items-center justify-center">
-              {userData?.profilePicture ? (
-                <img 
-                  src={`data:image/jpeg;base64,${userData.profilePicture}`}
-                  alt="Profile" 
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span className="text-white text-sm sm:text-lg font-semibold">
-                  {userData?.username?.charAt(0)?.toUpperCase() || 'U'}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Mobile Overlay */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+      <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} userData={userData} />
 
       <div className="flex pt-[60px] sm:pt-[73px]">
         {/* Sidebar - Made Sticky */}
-        <aside className={`w-64 bg-[#8D2B7E] fixed left-0 top-[60px] sm:top-[73px] bottom-0 flex flex-col z-50 transform transition-transform duration-300 ease-in-out ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        }`}>
-          <nav className="p-4 space-y-4 flex-grow">
-            <Link to="/dashboard" onClick={() => setSidebarOpen(false)} className="block py-2 px-4 hover:bg-[#8D2B7E]/80 text-white rounded">
-              Dashboard
-            </Link>
-            <Link to="/search" onClick={() => setSidebarOpen(false)} className="block py-2 px-4 hover:bg-[#8D2B7E]/80 text-white rounded">
-              Search Developers
-            </Link>
-            <Link to="/join-sprint" onClick={() => setSidebarOpen(false)} className="block py-2 px-4 bg-[#8D2B7E] text-white rounded">
-              Join Sprint
-            </Link>
-            <Link to="/create-sprint" onClick={() => setSidebarOpen(false)} className="block py-2 px-4 hover:bg-[#8D2B7E]/80 text-white rounded">
-              Create Sprint
-            </Link>
-          </nav>
-          {/* Sign Out Button */}
-          <div className="p-4 border-t border-[#8D2B7E]/20">
-            <button
-              onClick={handleSignOut}
-              className="w-full py-2 px-4 bg-[#111] text-white rounded hover:bg-[#222] transition-colors flex items-center justify-center gap-2"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1H3zm11 4.414l-4.293 4.293a1 1 0 01-1.414 0L4 7.414 5.414 6l3.293 3.293L12 6l2 1.414z" clipRule="evenodd" />
-              </svg>
-              Sign Out
-            </button>
-          </div>
-        </aside>
+        <Sidebar 
+          isOpen={sidebarOpen} 
+          onClose={() => setSidebarOpen(false)} 
+          onSignOut={handleSignOut} 
+        />
 
         {/* Main Content - Added margin-left to account for fixed sidebar */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 lg:ml-64">
-          <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-white">Join a Sprint</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-[#8D2B7E] to-[#FF96F5] bg-clip-text text-transparent">Join a Sprint</h1>
       
       {/* Tab Navigation */}
-      <div className="flex flex-wrap gap-2 sm:space-x-1 mb-4 sm:mb-6 bg-gray-900/50 p-1 rounded-lg w-full sm:w-fit">
+      <div className="flex flex-wrap gap-2 sm:space-x-1 mb-6 bg-[#1a1a1a]/40 backdrop-blur-xl border border-[#8D2B7E]/20 p-1.5 rounded-xl w-full sm:w-fit">
         <button
           onClick={() => setActiveTab('all')}
-          className={`px-4 sm:px-6 py-2 sm:py-3 rounded-md font-medium transition-colors text-sm sm:text-base ${
+          className={`px-6 py-2.5 rounded-lg font-medium transition-all text-sm sm:text-base ${
             activeTab === 'all'
-              ? 'bg-[#8D2B7E] text-white'
-              : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
+              ? 'bg-gradient-to-r from-[#8D2B7E] to-[#A259C6] text-white shadow-[0_0_15px_rgba(141,43,126,0.3)]'
+              : 'text-gray-400 hover:text-white hover:bg-white/5'
           }`}
         >
           All Sprints
         </button>
         <button
           onClick={() => setActiveTab('joined')}
-          className={`px-4 sm:px-6 py-2 sm:py-3 rounded-md font-medium transition-colors text-sm sm:text-base ${
+          className={`px-6 py-2.5 rounded-lg font-medium transition-all text-sm sm:text-base ${
             activeTab === 'joined'
-              ? 'bg-[#8D2B7E] text-white'
-              : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
+              ? 'bg-gradient-to-r from-[#8D2B7E] to-[#A259C6] text-white shadow-[0_0_15px_rgba(141,43,126,0.3)]'
+              : 'text-gray-400 hover:text-white hover:bg-white/5'
           }`}
         >
           Joined
@@ -736,10 +663,10 @@ function JoinSprint() {
               fetchAISprintMatches();
             }
           }}
-          className={`px-4 sm:px-6 py-2 sm:py-3 rounded-md font-medium transition-colors text-sm sm:text-base ${
+          className={`px-6 py-2.5 rounded-lg font-medium transition-all text-sm sm:text-base ${
             activeTab === 'ai'
-              ? 'bg-[#8D2B7E] text-white'
-              : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
+              ? 'bg-gradient-to-r from-[#8D2B7E] to-[#A259C6] text-white shadow-[0_0_15px_rgba(141,43,126,0.3)]'
+              : 'text-gray-400 hover:text-white hover:bg-white/5'
           }`}
         >
           🤖 AI Recommended
@@ -757,22 +684,30 @@ function JoinSprint() {
           {mySprints.map((sprint) => (
           <div
             key={String(sprint._id)}
-            className="bg-[#111] border-2 border-[#FF96F5] rounded-2xl sm:rounded-3xl p-4 sm:p-6 hover:shadow-lg text-white flex flex-col h-full"
+            className="group bg-[#1a1a1a]/40 backdrop-blur-xl border border-[#8D2B7E]/20 rounded-3xl p-6 hover:border-[#8D2B7E]/50 transition-all hover:shadow-[0_0_20px_rgba(141,43,126,0.15)] flex flex-col h-full relative overflow-hidden"
           >
-            <div className="flex-1 flex flex-col">
-              <div className="text-[#8D2B7E] font-semibold mb-2 text-xs sm:text-sm">
-                ~By {sprint.creator?.username || "user"}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#8D2B7E]/10 rounded-full blur-2xl -mr-16 -mt-16 transition-all group-hover:bg-[#8D2B7E]/20"></div>
+            
+            <div className="flex-1 flex flex-col relative z-10">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#8D2B7E] to-[#2D033B] flex items-center justify-center text-[10px] font-bold ring-1 ring-[#8D2B7E]/30">
+                  {sprint.creator?.username?.charAt(0)?.toUpperCase()}
+                </div>
+                <div className="text-gray-400 text-xs font-medium">
+                   {sprint.creator?.username || "user"}
+                </div>
               </div>
-              <div className="font-bold text-base sm:text-lg mb-1">{sprint.title}</div>
-              <div className="text-xs sm:text-sm mb-3 text-gray-400 line-clamp-2">{sprint.description}</div>
+              
+              <div className="font-bold text-lg mb-2 text-white group-hover:text-[#FF96F5] transition-colors">{sprint.title}</div>
+              <div className="text-sm mb-4 text-gray-400 line-clamp-2 leading-relaxed">{sprint.description}</div>
             </div>
 
-            <div className="flex flex-col sm:flex-row justify-between gap-2 sm:gap-0 mt-auto">
+            <div className="flex flex-col sm:flex-row justify-between gap-3 mt-auto relative z-10 pt-4 border-t border-white/5">
               <button 
                 onClick={() => handleOpenViewModal(sprint)}
-                className="bg-[#8D2B7E] text-white rounded-md px-3 sm:px-4 py-2 hover:bg-[#8D2B7E]/80 transition text-sm sm:text-base w-full sm:w-auto whitespace-nowrap"
+                className="bg-white/5 text-gray-300 rounded-xl px-4 py-2 hover:bg-white/10 hover:text-white transition-all text-sm font-medium w-full sm:w-auto"
               >
-                View
+                View Details
               </button>
             {renderButton(sprint)}
           </div>
@@ -816,25 +751,32 @@ function JoinSprint() {
                 return (
                   <div
                     key={match.sprintId}
-                    className="bg-[#111] border-2 border-[#8D2B7E]/40 rounded-2xl sm:rounded-3xl p-4 sm:p-6 hover:shadow-lg text-white relative flex flex-col h-full"
+                    className="group bg-[#1a1a1a]/40 backdrop-blur-xl border border-[#8D2B7E]/20 rounded-3xl p-6 hover:border-[#8D2B7E]/50 transition-all hover:shadow-[0_0_20px_rgba(141,43,126,0.15)] flex flex-col h-full relative overflow-hidden"
                   >
+                     <div className="absolute top-0 right-0 w-32 h-32 bg-[#8D2B7E]/10 rounded-full blur-2xl -mr-16 -mt-16 transition-all group-hover:bg-[#8D2B7E]/20"></div>
+
                     {/* Compatibility Badge */}
-                    <div className="absolute top-3 right-3 sm:top-4 sm:right-4 bg-gradient-to-r from-[#8D2B7E] to-[#FF96F5] text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-bold z-10">
+                    <div className="absolute top-3 right-3 sm:top-4 sm:right-4 bg-gradient-to-r from-[#8D2B7E] to-[#FF96F5] text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-bold z-10 shadow-lg">
                       {match.compatibility}% Match
                     </div>
                     
-                    <div className="flex-1 flex flex-col">
-                      <div className="text-[#8D2B7E] font-semibold mb-2 text-xs sm:text-sm">
-                        ~By {sprint.creator?.username || "user"}
+                    <div className="flex-1 flex flex-col relative z-10">
+                      <div className="flex items-center gap-2 mb-3">
+                         <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#8D2B7E] to-[#2D033B] flex items-center justify-center text-[10px] font-bold ring-1 ring-[#8D2B7E]/30">
+                          {sprint.creator?.username?.charAt(0)?.toUpperCase()}
+                        </div>
+                        <div className="text-gray-400 text-xs font-medium">
+                          {sprint.creator?.username || "user"}
+                        </div>
                       </div>
-                      <div className="font-bold text-base sm:text-lg mb-1">{sprint.title}</div>
-                      <div className="text-xs sm:text-sm mb-3 text-gray-400 line-clamp-2">{sprint.description}</div>
+                      <div className="font-bold text-lg mb-2 text-white group-hover:text-[#FF96F5] transition-colors">{sprint.title}</div>
+                      <div className="text-sm mb-4 text-gray-400 line-clamp-2 leading-relaxed">{sprint.description}</div>
                       
                       {/* Reasons */}
                       {match.reasons && match.reasons.length > 0 && (
-                        <div className="mb-3 space-y-1">
+                        <div className="mb-4 space-y-1.5">
                           {match.reasons.map((reason, idx) => (
-                            <p key={idx} className="text-xs text-gray-400 bg-gray-800/50 px-2 py-1 rounded">
+                            <p key={idx} className="text-xs text-blue-200/80 bg-blue-500/10 border border-blue-500/20 px-2 py-1.5 rounded-lg flex items-center gap-2">
                               ✓ {reason}
                             </p>
                           ))}
@@ -842,12 +784,12 @@ function JoinSprint() {
                       )}
                     </div>
 
-                    <div className="flex flex-col sm:flex-row justify-between gap-2 sm:gap-0 mt-auto">
+                    <div className="flex flex-col sm:flex-row justify-between gap-3 mt-auto relative z-10 pt-4 border-t border-white/5">
                       <button 
                         onClick={() => handleOpenViewModal(sprint)}
-                        className="bg-[#8D2B7E] text-white rounded-md px-3 sm:px-4 py-2 hover:bg-[#8D2B7E]/80 transition text-sm sm:text-base w-full sm:w-auto whitespace-nowrap"
+                        className="bg-white/5 text-gray-300 rounded-xl px-4 py-2 hover:bg-white/10 hover:text-white transition-all text-sm font-medium w-full sm:w-auto"
                       >
-                        View
+                        View Details
                       </button>
                       {renderButton(sprint)}
                     </div>
@@ -882,35 +824,42 @@ function JoinSprint() {
             {filteredJoinedSprints.map((sprint) => (
               <div
                 key={String(sprint._id)}
-                className="bg-[#111] border-2 border-[#FF96F5] rounded-2xl sm:rounded-3xl p-4 sm:p-6 hover:shadow-lg text-white flex flex-col h-full"
+                className="group bg-[#1a1a1a]/40 backdrop-blur-xl border border-[#8D2B7E]/20 rounded-3xl p-6 hover:border-[#8D2B7E]/50 transition-all hover:shadow-[0_0_20px_rgba(141,43,126,0.15)] flex flex-col h-full relative overflow-hidden"
               >
-                <div className="flex items-center justify-between mb-3">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-[#8D2B7E]/10 rounded-full blur-2xl -mr-16 -mt-16 transition-all group-hover:bg-[#8D2B7E]/20"></div>
+
+                <div className="flex items-center justify-between mb-4 relative z-10">
                   <div
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                    className={`px-3 py-1 rounded-full text-xs font-bold border ${
                       isSprintEnded(sprint)
-                        ? "bg-red-500/20 text-red-300 border border-red-500/30"
-                        : "bg-green-500/20 text-green-200 border border-green-500/30"
+                        ? "bg-red-500/10 text-red-400 border-red-500/20"
+                        : "bg-green-500/10 text-green-400 border-green-500/20"
                     }`}
                   >
-                    {isSprintEnded(sprint) ? "Ended" : "Active"}
+                    {isSprintEnded(sprint) ? "● Ended" : "● Active"}
                   </div>
                   {sprint.endDate && (
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-gray-400 font-medium bg-black/20 px-2 py-1 rounded-lg">
                       Ends {new Date(sprint.endDate).toLocaleDateString()}
                     </p>
                   )}
                 </div>
-                <div className="flex-1 flex flex-col">
-                  <div className="text-[#8D2B7E] font-semibold mb-2 text-xs sm:text-sm">
-                    ~By {sprint.creator?.username || "user"}
-                  </div>
-                  <div className="font-bold text-base sm:text-lg mb-1">{sprint.title}</div>
-                  <div className="text-xs sm:text-sm mb-3 text-gray-400 line-clamp-2">
+                <div className="flex-1 flex flex-col relative z-10">
+                   <div className="flex items-center gap-2 mb-3">
+                         <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#8D2B7E] to-[#2D033B] flex items-center justify-center text-[10px] font-bold ring-1 ring-[#8D2B7E]/30">
+                          {sprint.creator?.username?.charAt(0)?.toUpperCase()}
+                        </div>
+                        <div className="text-gray-400 text-xs font-medium">
+                          {sprint.creator?.username || "user"}
+                        </div>
+                      </div>
+                  <div className="font-bold text-lg mb-2 text-white group-hover:text-[#FF96F5] transition-colors">{sprint.title}</div>
+                  <div className="text-sm mb-4 text-gray-400 line-clamp-2 leading-relaxed">
                     {sprint.description}
                   </div>
                 </div>
                 <button
-                  className="bg-[#8D2B7E] text-white rounded-md px-3 sm:px-4 py-2 mt-auto hover:bg-[#8D2B7E]/80 transition text-sm sm:text-base w-full sm:w-auto"
+                  className="bg-gradient-to-r from-[#8D2B7E] to-[#A259C6] text-white rounded-xl px-4 py-3 mt-auto hover:shadow-[0_0_15px_rgba(141,43,126,0.4)] transition-all text-sm font-bold w-full relative z-10"
                   onClick={() =>
                     navigate(
                       isSprintEnded(sprint)
@@ -919,7 +868,7 @@ function JoinSprint() {
                     )
                   }
                 >
-                  {isSprintEnded(sprint) ? "View Summary" : "Go to Sprint"}
+                  {isSprintEnded(sprint) ? "View Summary" : "Go to Sprint →"}
                 </button>
               </div>
             ))}
@@ -935,18 +884,25 @@ function JoinSprint() {
       {/* Modal for viewing sprint details */}
       {isViewModalOpen && selectedSprintForView && (
         <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-[#111] border-2 border-[#8D2B7E]/50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 max-w-3xl w-full text-white my-4 max-h-[90vh] overflow-y-auto shadow-2xl">
+          <div className="bg-[#1a1a1a] border border-[#8D2B7E]/30 rounded-3xl p-6 sm:p-8 max-w-3xl w-full text-white my-4 max-h-[90vh] overflow-y-auto shadow-2xl relative">
+             <div className="absolute top-0 right-0 w-64 h-64 bg-[#8D2B7E]/10 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
+
             {/* Header */}
-            <div className="flex justify-between items-start mb-6 pb-4 border-b border-[#8D2B7E]/30">
+            <div className="flex justify-between items-start mb-8 pb-6 border-b border-[#8D2B7E]/20 relative z-10">
               <div className="flex-1">
-                <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[#8D2B7E] to-[#FF96F5] bg-clip-text text-transparent mb-2">
+                <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-[#8D2B7E] to-[#FF96F5] bg-clip-text text-transparent mb-3">
                   {selectedSprintForView.title}
                 </h2>
-                <div className="flex items-center gap-2 text-sm text-gray-400">
+                <div className="flex items-center gap-3 text-sm text-gray-400">
                   <span>Created by</span>
-                  <span className="text-[#8D2B7E] font-semibold">
-                    {selectedSprintForView.creator?.username || "Unknown"}
-                  </span>
+                   <div className="flex items-center gap-2 bg-[#2D033B]/50 px-3 py-1 rounded-full border border-[#8D2B7E]/20">
+                     <div className="w-5 h-5 rounded-full bg-gradient-to-br from-[#8D2B7E] to-[#2D033B] flex items-center justify-center text-[10px] font-bold">
+                        {selectedSprintForView.creator?.username?.charAt(0)?.toUpperCase()}
+                      </div>
+                      <span className="text-white font-medium">
+                        {selectedSprintForView.creator?.username || "Unknown"}
+                      </span>
+                   </div>
                 </div>
               </div>
               <button
@@ -954,25 +910,27 @@ function JoinSprint() {
                   setIsViewModalOpen(false);
                   setSelectedSprintForView(null);
                 }}
-                className="text-gray-400 hover:text-white text-3xl font-bold transition-colors ml-4"
+                className="text-gray-400 hover:text-white p-2 hover:bg-white/10 rounded-full transition-all"
               >
-                ×
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-8 relative z-10">
               {/* Description Section */}
-              <div className="bg-[#2D033B]/50 rounded-xl p-4 sm:p-5 border border-[#8D2B7E]/20">
+              <div className="bg-[#2D033B]/30 rounded-2xl p-6 border border-[#8D2B7E]/10">
                 <h3 className="text-lg font-bold text-[#FF96F5] mb-3 flex items-center gap-2">
                   <span>📝</span> Description
                 </h3>
-                <p className="text-gray-300 whitespace-pre-wrap leading-relaxed">
-                  {selectedSprintForView.description || "No description provided"}
+                <p className="text-gray-300 leading-relaxed text-sm sm:text-base whitespace-pre-wrap">
+                  {selectedSprintForView.description}
                 </p>
               </div>
 
-              {/* Tech Stack Section */}
-              <div className="bg-[#2D033B]/50 rounded-xl p-4 sm:p-5 border border-[#8D2B7E]/20">
+               {/* Tech Stack Section */}
+              <div className="bg-[#2D033B]/30 rounded-2xl p-6 border border-[#8D2B7E]/10">
                 <h3 className="text-lg font-bold text-[#FF96F5] mb-3 flex items-center gap-2">
                   <span>⚙️</span> Tech Stack
                 </h3>
@@ -981,7 +939,7 @@ function JoinSprint() {
                     selectedSprintForView.techStack.map((tech, idx) => (
                       <span
                         key={idx}
-                        className="bg-gradient-to-r from-[#8D2B7E] to-[#A259C6] text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg"
+                        className="bg-white/5 border border-white/10 text-gray-300 px-3 py-1.5 rounded-lg text-sm font-medium"
                       >
                         {tech}
                       </span>
@@ -992,14 +950,14 @@ function JoinSprint() {
                 </div>
               </div>
 
-              {/* Timeline Section */}
-              <div className="bg-[#2D033B]/50 rounded-xl p-4 sm:p-5 border border-[#8D2B7E]/20">
+              {/* Details Grid */}
+              <div>
                 <h3 className="text-lg font-bold text-[#FF96F5] mb-4 flex items-center gap-2">
-                  <span>📅</span> Timeline
+                  <span>⚡</span> Sprint Details
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="bg-[#111]/50 rounded-lg p-3">
-                    <p className="text-xs text-gray-400 mb-1">Start Date</p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="bg-[#111]/50 rounded-2xl p-4 border border-white/5">
+                    <p className="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wider">Start Date</p>
                     <p className="text-white font-semibold">
                       {selectedSprintForView.startDate
                         ? new Date(selectedSprintForView.startDate).toLocaleDateString("en-US", {
@@ -1010,8 +968,8 @@ function JoinSprint() {
                         : "Not set"}
                     </p>
                   </div>
-                  <div className="bg-[#111]/50 rounded-lg p-3">
-                    <p className="text-xs text-gray-400 mb-1">End Date</p>
+                  <div className="bg-[#111]/50 rounded-2xl p-4 border border-white/5">
+                    <p className="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wider">End Date</p>
                     <p className="text-white font-semibold">
                       {selectedSprintForView.endDate
                         ? new Date(selectedSprintForView.endDate).toLocaleDateString("en-US", {
@@ -1022,180 +980,64 @@ function JoinSprint() {
                         : "Not set"}
                     </p>
                   </div>
-                  <div className="bg-[#111]/50 rounded-lg p-3">
-                    <p className="text-xs text-gray-400 mb-1">Duration</p>
+                  <div className="bg-[#111]/50 rounded-2xl p-4 border border-white/5">
+                    <p className="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wider">Duration</p>
                     <p className="text-white font-semibold">
                       {selectedSprintForView.duration
                         ? `${selectedSprintForView.duration} day${selectedSprintForView.duration !== 1 ? "s" : ""}`
                         : "Not specified"}
                     </p>
                   </div>
+                   <div className="bg-[#111]/50 rounded-2xl p-4 border border-white/5">
+                    <p className="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wider">Status</p>
+                     <div className="flex items-center gap-2">
+                        <span className={`w-2 h-2 rounded-full ${selectedSprintForView.isActive ? 'bg-green-500' : 'bg-gray-500'}`}></span>
+                         <p className="text-white font-semibold">{selectedSprintForView.isActive ? 'Active' : 'Inactive'}</p>
+                     </div>
+                  </div>
                 </div>
               </div>
 
               {/* Team Section */}
-              <div className="bg-[#2D033B]/50 rounded-xl p-4 sm:p-5 border border-[#8D2B7E]/20">
-                <h3 className="text-lg font-bold text-[#FF96F5] mb-4 flex items-center gap-2">
-                  <span>👥</span> Team
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                  <div className="bg-[#111]/50 rounded-lg p-3">
-                    <p className="text-xs text-gray-400 mb-1">Current Team Size</p>
-                    <p className="text-2xl font-bold text-[#8D2B7E]">
-                      {selectedSprintForView.teamMembers?.length || 0}
-                    </p>
-                    <p className="text-xs text-gray-400 mt-1">member{(selectedSprintForView.teamMembers?.length || 0) !== 1 ? "s" : ""}</p>
-                  </div>
-                  <div className="bg-[#111]/50 rounded-lg p-3">
-                    <p className="text-xs text-gray-400 mb-1">Max Team Size</p>
-                    <p className="text-2xl font-bold text-[#FF96F5]">
-                      {selectedSprintForView.maxTeamSize || "∞"}
-                    </p>
-                  </div>
+              <div className="bg-[#2D033B]/30 rounded-2xl p-6 border border-[#8D2B7E]/10">
+                <div className="flex justify-between items-center mb-4">
+                   <h3 className="text-lg font-bold text-[#FF96F5] flex items-center gap-2">
+                    <span>👥</span> Team
+                  </h3>
+                  <span className="text-xs font-mono text-gray-400 bg-white/5 px-2 py-1 rounded">
+                    {selectedSprintForView.teamMembers?.length || 0} / {selectedSprintForView.maxTeamSize || "∞"} Members
+                  </span>
                 </div>
-                {selectedSprintForView.teamMembers && selectedSprintForView.teamMembers.length > 0 && (
-                  <div>
-                    <p className="text-sm text-gray-400 mb-2">Team Members:</p>
+                
+                {selectedSprintForView.teamMembers && selectedSprintForView.teamMembers.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
                       {selectedSprintForView.teamMembers.map((member, idx) => (
-                        <span
-                          key={idx}
-                          className="bg-[#8D2B7E]/20 text-white border border-[#8D2B7E]/50 px-3 py-1.5 rounded-full text-sm"
-                        >
-                          {member.username || member.email || "Member"}
-                        </span>
+                        <div key={idx} className="flex items-center gap-2 bg-[#111]/60 pr-3 pl-2 py-1.5 rounded-full border border-white/5">
+                           <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#8D2B7E] to-[#2D033B] flex items-center justify-center text-[10px] font-bold">
+                              {member.username?.charAt(0)?.toUpperCase() || "U"}
+                            </div>
+                          <span className="text-sm text-gray-300">
+                            {member.username || member.email || "Member"}
+                          </span>
+                        </div>
                       ))}
                     </div>
-                  </div>
+                ): (
+                   <p className="text-gray-500 italic">No members yet.</p>
                 )}
               </div>
 
-              {/* Resources Section */}
-              {/* {selectedSprintForView.resources && (
-                <div className="bg-[#2D033B]/50 rounded-xl p-4 sm:p-5 border border-[#8D2B7E]/20">
-                  <h3 className="text-lg font-bold text-[#FF96F5] mb-3 flex items-center gap-2">
-                    <span>🔗</span> Resources
-                  </h3>
-                  <div className="space-y-3">
-                    {selectedSprintForView.resources.github && (
-                      <div className="bg-[#111]/50 rounded-lg p-3 flex items-center gap-3">
-                        <span className="text-2xl">📦</span>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs text-gray-400 mb-1">GitHub Repository</p>
-                          <a
-                            href={selectedSprintForView.resources.github}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[#8D2B7E] hover:text-[#FF96F5] text-sm break-all hover:underline"
-                          >
-                            {selectedSprintForView.resources.github}
-                          </a>
-                        </div>
-                      </div>
-                    )}
-                    {selectedSprintForView.resources.figma && (
-                      <div className="bg-[#111]/50 rounded-lg p-3 flex items-center gap-3">
-                        <span className="text-2xl">🎨</span>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs text-gray-400 mb-1">Figma Design</p>
-                          <a
-                            href={selectedSprintForView.resources.figma}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[#8D2B7E] hover:text-[#FF96F5] text-sm break-all hover:underline"
-                          >
-                            {selectedSprintForView.resources.figma}
-                          </a>
-                        </div>
-                      </div>
-                    )}
-                    {selectedSprintForView.resources.docs && (
-                      <div className="bg-[#111]/50 rounded-lg p-3 flex items-center gap-3">
-                        <span className="text-2xl">📄</span>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs text-gray-400 mb-1">Documentation</p>
-                          <a
-                            href={selectedSprintForView.resources.docs}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[#8D2B7E] hover:text-[#FF96F5] text-sm break-all hover:underline"
-                          >
-                            {selectedSprintForView.resources.docs}
-                          </a>
-                        </div>
-                      </div>
-                    )}
-                    {selectedSprintForView.resources.extraLinks &&
-                      selectedSprintForView.resources.extraLinks.length > 0 &&
-                      selectedSprintForView.resources.extraLinks.map((link, idx) => (
-                        <div key={idx} className="bg-[#111]/50 rounded-lg p-3 flex items-center gap-3">
-                          <span className="text-2xl">🔗</span>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs text-gray-400 mb-1">Additional Link</p>
-                            <a
-                              href={link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-[#8D2B7E] hover:text-[#FF96F5] text-sm break-all hover:underline"
-                            >
-                              {link}
-                            </a>
-                          </div>
-                        </div>
-                      ))}
-                    {!selectedSprintForView.resources.github &&
-                      !selectedSprintForView.resources.figma &&
-                      !selectedSprintForView.resources.docs &&
-                      (!selectedSprintForView.resources.extraLinks ||
-                        selectedSprintForView.resources.extraLinks.length === 0) && (
-                        <p className="text-gray-400 text-sm text-center py-4">No resources added yet</p>
-                      )}
-                  </div>
-                </div>
-              )} */}
-
-              {/* Status Section */}
-              <div className="bg-[#2D033B]/50 rounded-xl p-4 sm:p-5 border border-[#8D2B7E]/20">
-                <h3 className="text-lg font-bold text-[#FF96F5] mb-3 flex items-center gap-2">
-                  <span>📊</span> Status
-                </h3>
-                <div className="flex flex-wrap gap-3">
-                  {selectedSprintForView.isFinished ? (
-                    <span className="bg-red-500/20 text-red-300 border border-red-500/50 px-4 py-2 rounded-full text-sm font-medium">
-                      ✗ Finished
-                    </span>
-                  ) : selectedSprintForView.isActive ? (
-                    <span className="bg-green-500/20 text-green-300 border border-green-500/50 px-4 py-2 rounded-full text-sm font-medium">
-                      ✓ Active
-                    </span>
-                  ) : (
-                    <span className="bg-gray-500/20 text-gray-300 border border-gray-500/50 px-4 py-2 rounded-full text-sm font-medium">
-                      ○ Inactive
-                    </span>
-                  )}
-                  {selectedSprintForView.isPublic ? (
-                    <span className="bg-blue-500/20 text-blue-300 border border-blue-500/50 px-4 py-2 rounded-full text-sm font-medium">
-                      🌐 Public
-                    </span>
-                  ) : (
-                    <span className="bg-yellow-500/20 text-yellow-300 border border-yellow-500/50 px-4 py-2 rounded-full text-sm font-medium">
-                      🔒 Private
-                    </span>
-                  )}
-                </div>
+              <div className="mt-8 pt-6 border-t border-[#8D2B7E]/20 flex justify-end">
+                <button
+                  onClick={() => {
+                    setIsViewModalOpen(false);
+                    setSelectedSprintForView(null);
+                  }}
+                  className="px-8 py-3 bg-gradient-to-r from-[#8D2B7E] to-[#FF96F5] text-white rounded-xl hover:shadow-[0_0_15px_rgba(141,43,126,0.4)] transition-all text-sm font-bold"
+                >
+                  Close
+                </button>
               </div>
-            </div>
-
-            <div className="mt-6 pt-4 border-t border-[#8D2B7E]/30 flex justify-end">
-              <button
-                onClick={() => {
-                  setIsViewModalOpen(false);
-                  setSelectedSprintForView(null);
-                }}
-                className="px-6 py-2.5 bg-gradient-to-r from-[#8D2B7E] to-[#FF96F5] text-white rounded-lg hover:from-[#A259C6] hover:to-[#FF96F5] transition-all text-sm sm:text-base font-semibold shadow-lg"
-              >
-                Close
-              </button>
             </div>
           </div>
         </div>
@@ -1245,6 +1087,7 @@ function JoinSprint() {
         </main>
       </div>
     </div>
+    
   );
 }
 

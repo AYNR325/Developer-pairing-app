@@ -650,6 +650,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import Sidebar from '../components/Sidebar';
+import Navbar from '../components/Navbar';
 
 const EXPERIENCE_OPTIONS = [1,2,3,4,5,6,7,8,9,10];
 const LANGUAGE_OPTIONS = [
@@ -936,89 +938,14 @@ function Search() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Header - Made Sticky */}
-      <header className="bg-black border-b-2 border-[#FF96F5] p-3 sm:p-4 fixed top-0 left-0 right-0 z-50">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            {/* Hamburger Menu Button - Mobile Only */}
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden w-10 h-10 flex items-center justify-center text-white hover:bg-gray-800 rounded-lg transition-colors"
-              aria-label="Toggle menu"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                {sidebarOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
-            </button>
-            <span className="text-[#8D2B7E] text-xl sm:text-2xl">&lt;/&gt;</span>
-            <span className="text-[#8D2B7E] text-xl sm:text-2xl font-semibold">DevHub</span>
-          </div>
-          <div className="flex items-center space-x-4 sm:space-x-8">
-            <nav className="hidden md:flex space-x-4 lg:space-x-6">
-              <Link to="/dashboard" className="hover:text-[#8D2B7E] text-sm lg:text-base">Home</Link>
-              <Link to="/network" className="hover:text-[#8D2B7E] text-sm lg:text-base">My Network</Link>
-              <Link to="/chats" className="hover:text-[#8D2B7E] text-sm lg:text-base">Chats</Link>
-            </nav>
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#8D2B7E] rounded-full overflow-hidden flex items-center justify-center">
-              {userData?.profilePicture && userData.profilePicture !== 'data:image/jpeg;base64' ? (
-                <img
-                  src={userData.profilePicture.startsWith('data:') ? userData.profilePicture : `data:image/jpeg;base64,${userData.profilePicture}`}
-                  alt="Profile"
-                  className="w-full h-full object-cover"
-                  onError={(e) => { console.error('Error loading profile picture:', e); e.target.style.display='none'; }}
-                />
-              ) : (
-                <span className="text-white text-sm sm:text-lg font-semibold">{userData?.username?.charAt(0)?.toUpperCase() || 'U'}</span>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Mobile Overlay */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+      <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} userData={userData} />
 
       <div className="flex pt-[60px] sm:pt-[73px]">
-        {/* Sidebar - Made Sticky */}
-        <aside className={`w-64 bg-[#8D2B7E] fixed left-0 top-[60px] sm:top-[73px] bottom-0 flex flex-col z-50 transform transition-transform duration-300 ease-in-out ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        }`}>
-          <nav className="p-4 space-y-4 flex-grow">
-            <Link to="/dashboard" onClick={() => setSidebarOpen(false)} className="block py-2 px-4 hover:bg-[#8D2B7E]/80 text-white rounded">
-              Dashboard
-            </Link>
-            <Link to="/search" onClick={() => setSidebarOpen(false)} className="block py-2 px-4 bg-[#8D2B7E] text-white rounded">
-              Search Developers
-            </Link>
-            <Link to="/join-sprint" onClick={() => setSidebarOpen(false)} className="block py-2 px-4 hover:bg-[#8D2B7E]/80 text-white rounded">
-              Join Sprint
-            </Link>
-            <Link to="/create-sprint" onClick={() => setSidebarOpen(false)} className="block py-2 px-4 hover:bg-[#8D2B7E]/80 text-white rounded">
-              Create Sprint
-            </Link>
-          </nav>
-          {/* Sign Out Button */}
-          <div className="p-4 border-t border-[#8D2B7E]/20">
-            <button
-              onClick={handleSignOut}
-              className="w-full py-2 px-4 bg-[#111] text-white rounded hover:bg-[#222] transition-colors flex items-center justify-center gap-2"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1H3zm11 4.414l-4.293 4.293a1 1 0 01-1.414 0L4 7.414 5.414 6l3.293 3.293L12 6l2 1.414z" clipRule="evenodd" />
-              </svg>
-              Sign Out
-            </button>
-          </div>
-        </aside>
+        <Sidebar 
+          isOpen={sidebarOpen} 
+          onClose={() => setSidebarOpen(false)} 
+          onSignOut={handleSignOut} 
+        />
 
         {/* Main Content - Added margin-left to account for fixed sidebar */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 lg:ml-64">
@@ -1041,7 +968,7 @@ function Search() {
               </div>
               <input
                 type="text"
-                className="w-full bg-gray-900/50 border border-[#8D2B7E]/30 rounded-lg sm:rounded-xl pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#8D2B7E]/50 focus:border-[#8D2B7E] transition-all text-sm sm:text-base"
+                className="w-full bg-white/5 backdrop-blur-md border border-[#8D2B7E]/30 rounded-lg sm:rounded-xl pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#8D2B7E]/50 focus:border-[#8D2B7E] transition-all text-sm sm:text-base"
                 placeholder="Search by developer name..."
                 value={searchName}
                 onChange={e => setSearchName(e.target.value)}
@@ -1057,13 +984,13 @@ function Search() {
           </div>
         </div>
 
-        <div className="bg-gray-900/40 backdrop-blur-sm border border-[#8D2B7E]/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8">
+        <div className="bg-white/5 backdrop-blur-md border border-[#8D2B7E]/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8">
           <h2 className="text-lg sm:text-xl font-semibold mb-4 text-gray-200">Filter Options</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-4 sm:mb-6">
             <div>
               <label className="block mb-2 text-xs sm:text-sm font-medium text-gray-300">Experience Level</label>
               <select
-                className="w-full bg-gray-800/50 border border-[#8D2B7E]/30 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#8D2B7E]/50 transition-all text-sm sm:text-base"
+                className="w-full bg-white/5 backdrop-blur-md border border-[#8D2B7E]/30 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#8D2B7E]/50 transition-all text-sm sm:text-base"
                 value={filters.experienceYear}
                 onChange={e => handleFilterChange('experienceYear', e.target.value)}
               >
@@ -1075,7 +1002,7 @@ function Search() {
             <div>
               <label className="block mb-2 text-xs sm:text-sm font-medium text-gray-300">Availability</label>
               <select
-                className="w-full bg-gray-800/50 border border-[#8D2B7E]/30 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#8D2B7E]/50 transition-all text-sm sm:text-base"
+                className="w-full bg-white/5 backdrop-blur-md border border-[#8D2B7E]/30 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#8D2B7E]/50 transition-all text-sm sm:text-base"
                 value={filters.availability}
                 onChange={e => handleFilterChange('availability', e.target.value)}
               >
@@ -1092,7 +1019,7 @@ function Search() {
                 Apply Filters
               </button>
               <button
-                className="px-3 sm:px-4 py-2 sm:py-2.5 bg-gray-700/50 text-white rounded-lg font-semibold hover:bg-gray-700 transition-all text-sm sm:text-base"
+                className="px-3 sm:px-4 py-2 sm:py-2.5 bg-white/5 border border-white/10 text-white rounded-lg font-semibold hover:bg-white/10 transition-all text-sm sm:text-base"
                 onClick={handleClear}
               >
                 Clear
@@ -1110,7 +1037,7 @@ function Search() {
                   className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium transition-all duration-200 text-xs sm:text-sm ${
                     filters.preferredLanguages.includes(lang)
                       ? 'bg-gradient-to-r from-[#8D2B7E] to-[#FF96F5] text-white shadow-lg shadow-[#8D2B7E]/30'
-                      : 'bg-gray-800/50 text-gray-300 border border-[#8D2B7E]/20 hover:border-[#8D2B7E]/40 hover:bg-gray-800'
+                      : 'bg-white/5 text-gray-300 border border-white/10 hover:border-[#8D2B7E]/40 hover:bg-white/10'
                   }`}
                   onClick={() => handleLanguageToggle(lang)}
                 >

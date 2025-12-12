@@ -24,3 +24,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Interview Files
+INTERVIEW_ELEVATOR_PITCH.md 
+INTERVIEW_QUICK_REFERENCE.md
+PROJECT_EXPLANATION.md

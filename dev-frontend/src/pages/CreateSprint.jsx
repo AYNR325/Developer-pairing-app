@@ -3,7 +3,8 @@ import { useForm } from "react-hook-form";
 import { useUser } from "@/context/UserContext";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
-
+import Sidebar from "@/components/Sidebar";
+import Navbar from "@/components/Navbar";
 const isSprintEnded = (sprint) => {
   if (!sprint) return false;
   if (sprint.isFinished) return true;
@@ -107,145 +108,79 @@ function CreateSprint() {
   return (
     <>
       <div className="min-h-screen bg-black text-white">
-        {/* Header - Made Sticky */}
-        <header className="bg-black border-b-2 border-[#FF96F5] p-3 sm:p-4 fixed top-0 left-0 right-0 z-50">
-          <div className="max-w-7xl mx-auto flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              {/* Hamburger Menu Button - Mobile Only */}
-              <button
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="lg:hidden w-10 h-10 flex items-center justify-center text-white hover:bg-gray-800 rounded-lg transition-colors"
-                aria-label="Toggle menu"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  {sidebarOpen ? (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  ) : (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                  )}
-                </svg>
-              </button>
-              <span className="text-[#8D2B7E] text-xl sm:text-2xl">&lt;/&gt;</span>
-              <span className="text-[#8D2B7E] text-xl sm:text-2xl font-semibold">DevHub</span>
-            </div>
-            <div className="flex items-center space-x-4 sm:space-x-8">
-              <nav className="hidden md:flex space-x-4 lg:space-x-6">
-                <Link to="/dashboard" className="hover:text-[#8D2B7E] text-sm lg:text-base">Home</Link>
-                <Link to="/network" className="hover:text-[#8D2B7E] text-sm lg:text-base">My Network</Link>
-                <Link to="/chats" className="hover:text-[#8D2B7E] text-sm lg:text-base">Chats</Link>
-              </nav>
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#8D2B7E] rounded-full overflow-hidden flex items-center justify-center">
-                {userData?.profilePicture ? (
-                  <img 
-                    src={`data:image/jpeg;base64,${userData.profilePicture}`}
-                    alt="Profile" 
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="text-white text-sm sm:text-lg font-semibold">
-                    {userData?.username?.charAt(0)?.toUpperCase() || 'U'}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-        </header>
-
-        {/* Mobile Overlay */}
-        {sidebarOpen && (
-          <div 
-            className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-            onClick={() => setSidebarOpen(false)}
-          />
-        )}
-
+      <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} userData={userData} />
         <div className="flex pt-[60px] sm:pt-[73px]">
           {/* Sidebar - Made Sticky */}
-          <aside className={`w-64 bg-[#8D2B7E] fixed left-0 top-[60px] sm:top-[73px] bottom-0 flex flex-col z-50 transform transition-transform duration-300 ease-in-out ${
-            sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-          }`}>
-            <nav className="p-4 space-y-4 flex-grow">
-              <Link to="/dashboard" onClick={() => setSidebarOpen(false)} className="block py-2 px-4 hover:bg-[#8D2B7E]/80 text-white rounded">
-                Dashboard
-              </Link>
-              <Link to="/search" onClick={() => setSidebarOpen(false)} className="block py-2 px-4 hover:bg-[#8D2B7E]/80 text-white rounded">
-                Search Developers
-              </Link>
-              <Link to="/join-sprint" onClick={() => setSidebarOpen(false)} className="block py-2 px-4 hover:bg-[#8D2B7E]/80 text-white rounded">
-                Join Sprint
-              </Link>
-              <Link to="/create-sprint" onClick={() => setSidebarOpen(false)} className="block py-2 px-4 bg-[#8D2B7E] text-white rounded">
-                Create Sprint
-              </Link>
-            </nav>
-            {/* Sign Out Button */}
-            <div className="p-4 border-t border-[#8D2B7E]/20">
-              <button
-                onClick={handleSignOut}
-                className="w-full py-2 px-4 bg-[#111] text-white rounded hover:bg-[#222] transition-colors flex items-center justify-center gap-2"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1H3zm11 4.414l-4.293 4.293a1 1 0 01-1.414 0L4 7.414 5.414 6l3.293 3.293L12 6l2 1.414z" clipRule="evenodd" />
-                </svg>
-                Sign Out
-              </button>
-            </div>
-          </aside>
+          <Sidebar 
+            isOpen={sidebarOpen} 
+            onClose={() => setSidebarOpen(false)} 
+            onSignOut={handleSignOut} 
+          />
 
           {/* Main Content - Added margin-left to account for fixed sidebar */}
           <main className="flex-1 p-4 sm:p-6 lg:p-8 lg:ml-64">
-            <div className="flex justify-end mb-4 sm:mb-6">
+            <div className="flex justify-end mb-8 sm:mb-10">
               <button
-                className="bg-[#8D2B7E] text-white rounded-md px-3 sm:px-4 py-2 hover:bg-[#8D2B7E]/80 cursor-pointer text-sm sm:text-base"
+                className="group relative bg-[#8D2B7E] text-white rounded-xl px-6 py-3 hover:bg-[#A259C6] transition-all text-sm sm:text-base font-bold shadow-[0_0_20px_rgba(141,43,126,0.3)] hover:shadow-[0_0_25px_rgba(141,43,126,0.6)] overflow-hidden"
                 onClick={() => setshowForm(true)}
               >
-                Create Sprint
+                 <span className="relative z-10 flex items-center gap-2">
+                   <span>+</span> Create Sprint
+                 </span>
+                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
               </button>
             </div>
             <div className="px-0 sm:px-4">
-          <div className="flex flex-wrap gap-2 sm:gap-3 mb-4 sm:mb-6">
-            {["active", "ended", "all"].map((status) => (
-              <button
-                key={status}
-                onClick={() => setStatusFilter(status)}
-                className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold transition-colors ${
-                  statusFilter === status
-                    ? "bg-gradient-to-r from-[#8D2B7E] to-[#FF96F5] text-white"
-                    : "bg-gray-800 text-gray-300 hover:bg-gray-700"
-                }`}
-              >
-                {status.charAt(0).toUpperCase() + status.slice(1)}
-              </button>
-            ))}
-          </div>
+            <div className="flex flex-wrap gap-2 sm:gap-4 mb-8 sm:mb-10 p-2 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 w-fit">
+              {["active", "ended", "all"].map((status) => (
+                <button
+                  key={status}
+                  onClick={() => setStatusFilter(status)}
+                  className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                    statusFilter === status
+                      ? "bg-gradient-to-r from-[#8D2B7E] to-[#FF96F5] text-white shadow-lg shadow-purple-900/40 transform scale-105"
+                      : "text-gray-400 hover:text-white hover:bg-white/10"
+                  }`}
+                >
+                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                </button>
+              ))}
+            </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        {filteredSprints.map((sprint) => (
+          {filteredSprints.map((sprint) => (
             <div
               key={sprint._id}
-              className="bg-[#111] border-2 border-[#FF96F5] rounded-2xl sm:rounded-3xl p-4 sm:p-6 hover:shadow-lg text-white flex flex-col h-full"
+              className="group bg-[#1a1a1a]/40 backdrop-blur-xl border border-[#8D2B7E]/20 rounded-3xl p-6 hover:border-[#8D2B7E]/50 transition-all hover:shadow-[0_0_20px_rgba(141,43,126,0.15)] flex flex-col h-full relative overflow-hidden"
             >
-              <div className="flex items-center justify-between mb-3">
-                <div className={`px-2 sm:px-3 py-1 rounded-full text-xs font-semibold ${isSprintEnded(sprint) ? "bg-red-500/20 text-red-300 border border-red-500/30" : "bg-green-500/20 text-green-200 border border-green-500/30"}`}>
-                  {isSprintEnded(sprint) ? "Ended" : "Active"}
+               <div className="absolute top-0 right-0 w-32 h-32 bg-[#8D2B7E]/10 rounded-full blur-2xl -mr-16 -mt-16 transition-all group-hover:bg-[#8D2B7E]/20"></div>
+
+              <div className="flex items-center justify-between mb-4 relative z-10">
+                <div className={`px-3 py-1 rounded-full text-xs font-bold border ${isSprintEnded(sprint) ? "bg-red-500/10 text-red-400 border-red-500/20" : "bg-green-500/10 text-green-400 border-green-500/20"}`}>
+                  {isSprintEnded(sprint) ? "● Ended" : "● Active"}
                 </div>
                 {sprint.endDate && (
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-gray-400 font-medium bg-black/20 px-2 py-1 rounded-lg">
                     Ends {new Date(sprint.endDate).toLocaleDateString()}
                   </p>
                 )}
               </div>
-              <div className="flex-1 flex flex-col">
-                <div className="text-[#8D2B7E] font-semibold mb-2 text-xs sm:text-sm">
-                  ~By {sprint.creator?.username || "user"}
-                </div>
-                <div className="font-bold text-base sm:text-lg mb-1">{sprint.title}</div>
-                <div className="text-xs sm:text-sm mb-3 text-gray-400 line-clamp-2">
+              <div className="flex-1 flex flex-col relative z-10">
+                 <div className="flex items-center gap-2 mb-3">
+                     <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#8D2B7E] to-[#2D033B] flex items-center justify-center text-[10px] font-bold ring-1 ring-[#8D2B7E]/30">
+                      {sprint.creator?.username?.charAt(0)?.toUpperCase()}
+                    </div>
+                    <div className="text-gray-400 text-xs font-medium">
+                      {sprint.creator?.username || "user"}
+                    </div>
+                  </div>
+                <div className="font-bold text-lg mb-2 text-white group-hover:text-[#FF96F5] transition-colors">{sprint.title}</div>
+                <div className="text-sm mb-4 text-gray-400 line-clamp-2 leading-relaxed">
                   {sprint.description}
                 </div>
               </div>
 
-              <button className="bg-[#8D2B7E] text-white rounded-md px-3 sm:px-4 py-2 mt-auto hover:bg-[#8D2B7E]/80 transition text-sm sm:text-base w-full sm:w-auto" onClick={() => navigate(isSprintEnded(sprint) ? `/sprint/${sprint._id}/end` : `/sprint/${sprint._id}/board`)}>
-                {isSprintEnded(sprint) ? "View Summary" : "View"}
+              <button className="bg-gradient-to-r from-[#8D2B7E] to-[#A259C6] text-white rounded-xl px-4 py-3 mt-auto hover:shadow-[0_0_15px_rgba(141,43,126,0.4)] transition-all text-sm font-bold w-full relative z-10" onClick={() => navigate(isSprintEnded(sprint) ? `/sprint/${sprint._id}/end` : `/sprint/${sprint._id}/board`)}>
+                {isSprintEnded(sprint) ? "View Summary" : "View Board →"}
               </button>
             </div>
           ))}
@@ -260,162 +195,124 @@ function CreateSprint() {
         </div>
       </div>
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="bg-[#111] border-2 border-[#8D2B7E]/50 p-4 sm:p-8 rounded-2xl sm:rounded-3xl shadow-2xl max-w-md w-full space-y-4 sm:space-y-5 relative max-h-[90vh] overflow-y-auto"
+            className="bg-[#1a1a1a] border border-[#8D2B7E]/30 p-6 sm:p-8 rounded-3xl shadow-2xl max-w-lg w-full space-y-6 relative max-h-[90vh] overflow-y-auto"
           >
-            <div className="flex justify-between items-center mb-4 pb-4 border-b border-[#8D2B7E]/30">
-              <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#8D2B7E] to-[#FF96F5] bg-clip-text text-transparent">
+             <div className="absolute top-0 right-0 w-32 h-32 bg-[#8D2B7E]/10 rounded-full blur-2xl -mr-16 -mt-16 pointer-events-none"></div>
+
+            <div className="flex justify-between items-center mb-6 pb-4 border-b border-[#8D2B7E]/20 relative z-10">
+              <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[#8D2B7E] to-[#FF96F5] bg-clip-text text-transparent">
                 Create New Sprint
               </h2>
               <button
                 type="button"
-                className="text-gray-400 hover:text-white text-2xl sm:text-3xl font-bold transition-colors"
+                className="text-gray-400 hover:text-white p-2 hover:bg-white/10 rounded-full transition-all"
                 onClick={() => setshowForm(false)}
               >
-                ×
+                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-[#FF96F5] mb-2">
-                Sprint Name
-              </label>
-              <input
-                type="text"
-                placeholder="Enter sprint name"
-                {...register("sprintName", { required: true })}
-                className="w-full px-4 py-2.5 bg-[#2D033B]/50 border border-[#8D2B7E]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8D2B7E] text-white placeholder-gray-500 text-sm sm:text-base"
-              />
-            </div>
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-[#FF96F5] mb-2">
-                Sprint Description
-              </label>
-              <textarea
-                placeholder="Describe your sprint..."
-                {...register("sprintDescription", { required: true })}
-                rows={4}
-                className="w-full px-4 py-2.5 bg-[#2D033B]/50 border border-[#8D2B7E]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8D2B7E] text-white placeholder-gray-500 text-sm sm:text-base resize-none"
-              />
-            </div>
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-[#FF96F5] mb-3">
-                Tech Stack
-              </label>
-              <div className="grid grid-cols-2 gap-3 text-xs sm:text-sm bg-[#2D033B]/30 p-3 rounded-lg border border-[#8D2B7E]/20">
-                <label className="flex items-center gap-2 text-white cursor-pointer hover:text-[#FF96F5] transition-colors">
-                  <input
-                    type="checkbox"
-                    value="React"
-                    {...register("techStack")}
-                    className="w-4 h-4 text-[#8D2B7E] bg-[#2D033B] border-[#8D2B7E]/50 rounded focus:ring-[#8D2B7E] cursor-pointer"
-                  />
-                  <span>React</span>
+            
+            <div className="space-y-5 relative z-10">
+              <div>
+                <label className="block text-sm font-bold text-[#FF96F5] mb-2 pl-1">
+                  Sprint Name
                 </label>
-                <label className="flex items-center gap-2 text-white cursor-pointer hover:text-[#FF96F5] transition-colors">
-                  <input
-                    type="checkbox"
-                    value="Node.js"
-                    {...register("techStack")}
-                    className="w-4 h-4 text-[#8D2B7E] bg-[#2D033B] border-[#8D2B7E]/50 rounded focus:ring-[#8D2B7E] cursor-pointer"
-                  />
-                  <span>Node.js</span>
-                </label>
-                <label className="flex items-center gap-2 text-white cursor-pointer hover:text-[#FF96F5] transition-colors">
-                  <input
-                    type="checkbox"
-                    value="MongoDB"
-                    {...register("techStack")}
-                    className="w-4 h-4 text-[#8D2B7E] bg-[#2D033B] border-[#8D2B7E]/50 rounded focus:ring-[#8D2B7E] cursor-pointer"
-                  />
-                  <span>MongoDB</span>
-                </label>
-                <label className="flex items-center gap-2 text-white cursor-pointer hover:text-[#FF96F5] transition-colors">
-                  <input
-                    type="checkbox"
-                    value="Python"
-                    {...register("techStack")}
-                    className="w-4 h-4 text-[#8D2B7E] bg-[#2D033B] border-[#8D2B7E]/50 rounded focus:ring-[#8D2B7E] cursor-pointer"
-                  />
-                  <span>Python</span>
-                </label>
-                <label className="flex items-center gap-2 text-white cursor-pointer hover:text-[#FF96F5] transition-colors">
-                  <input
-                    type="checkbox"
-                    value="Express"
-                    {...register("techStack")}
-                    className="w-4 h-4 text-[#8D2B7E] bg-[#2D033B] border-[#8D2B7E]/50 rounded focus:ring-[#8D2B7E] cursor-pointer"
-                  />
-                  <span>Express</span>
-                </label>
-                <label className="flex items-center gap-2 text-white cursor-pointer hover:text-[#FF96F5] transition-colors">
-                  <input
-                    type="checkbox"
-                    value="Tailwind"
-                    {...register("techStack")}
-                    className="w-4 h-4 text-[#8D2B7E] bg-[#2D033B] border-[#8D2B7E]/50 rounded focus:ring-[#8D2B7E] cursor-pointer"
-                  />
-                  <span>Tailwind</span>
-                </label>
-                <label className="flex items-center gap-2 text-white cursor-pointer hover:text-[#FF96F5] transition-colors">
-                  <input
-                    type="checkbox"
-                    value="TypeScript"
-                    {...register("techStack")}
-                    className="w-4 h-4 text-[#8D2B7E] bg-[#2D033B] border-[#8D2B7E]/50 rounded focus:ring-[#8D2B7E] cursor-pointer"
-                  />
-                  <span>TypeScript</span>
-                </label>
-                <label className="flex items-center gap-2 text-white cursor-pointer hover:text-[#FF96F5] transition-colors">
-                  <input
-                    type="checkbox"
-                    value="JavaScript"
-                    {...register("techStack")}
-                    className="w-4 h-4 text-[#8D2B7E] bg-[#2D033B] border-[#8D2B7E]/50 rounded focus:ring-[#8D2B7E] cursor-pointer"
-                  />
-                  <span>JavaScript</span>
-                </label>
+                <input
+                  type="text"
+                  placeholder="e.g., Q4 Feature Implementation"
+                  {...register("sprintName", { required: true })}
+                  className="w-full px-4 py-3 bg-[#0a0a0a]/50 border border-[#8D2B7E]/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#8D2B7E] focus:border-transparent text-white placeholder-gray-600 transition-all font-medium"
+                />
               </div>
+              <div>
+                <label className="block text-sm font-bold text-[#FF96F5] mb-2 pl-1">
+                  Sprint Description
+                </label>
+                <textarea
+                  placeholder="What are the main goals of this sprint?"
+                  {...register("sprintDescription", { required: true })}
+                  rows={4}
+                  className="w-full px-4 py-3 bg-[#0a0a0a]/50 border border-[#8D2B7E]/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#8D2B7E] focus:border-transparent text-white placeholder-gray-600 transition-all resize-none font-medium"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-[#FF96F5] mb-2 pl-1">
+                  Tech Stack
+                </label>
+                <div className="grid grid-cols-2 gap-3 bg-[#0a0a0a]/30 p-4 rounded-xl border border-[#8D2B7E]/20">
+                  {['React', 'Node.js', 'MongoDB', 'Python', 'Express', 'Tailwind', 'TypeScript', 'JavaScript'].map((tech) => (
+                     <label key={tech} className="flex items-center gap-3 text-gray-300 cursor-pointer hover:text-white transition-colors p-1 rounded-lg hover:bg-white/5">
+                      <div className="relative flex items-center">
+                        <input
+                          type="checkbox"
+                          value={tech}
+                          {...register("techStack")}
+                          className="peer appearance-none w-5 h-5 border border-[#8D2B7E]/50 rounded checked:bg-[#8D2B7E] checked:border-[#8D2B7E] transition-all cursor-pointer"
+                        />
+                         <svg className="absolute w-3.5 h-3.5 text-white hidden peer-checked:block pointer-events-none left-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </div>
+                      <span className="font-medium text-sm">{tech}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-[#FF96F5] mb-2 pl-1">
+                    Duration (days)
+                  </label>
+                   <div className="relative">
+                    <input
+                      type="number"
+                      placeholder="e.g., 14"
+                      {...register("sprintDuration", { required: true })}
+                      className="w-full px-4 py-3 bg-[#0a0a0a]/50 border border-[#8D2B7E]/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#8D2B7E] text-white placeholder-gray-600 transition-all font-medium pl-10"
+                    />
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-lg">⏳</span>
+                   </div>
+                </div>
+                 <div>
+                  <label className="block text-sm font-bold text-[#FF96F5] mb-2 pl-1">
+                    Max Team Size
+                  </label>
+                   <div className="relative">
+                    <input
+                      type="number"
+                      placeholder="e.g., 5"
+                      {...register("teamSize", { required: true })}
+                      className="w-full px-4 py-3 bg-[#0a0a0a]/50 border border-[#8D2B7E]/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#8D2B7E] text-white placeholder-gray-600 transition-all font-medium pl-10"
+                    />
+                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-lg">👥</span>
+                   </div>
+                </div>
+               </div>
+               
+               <div>
+                  <label className="block text-sm font-bold text-[#FF96F5] mb-2 pl-1">
+                    Start Date
+                  </label>
+                   <input
+                    type="date"
+                    {...register("sprintStartDate", { required: true })}
+                    className="w-full px-4 py-3 bg-[#0a0a0a]/50 border border-[#8D2B7E]/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#8D2B7E] text-white [color-scheme:dark] transition-all font-medium cursor-pointer uppercase text-sm tracking-wider"
+                  />
+               </div>
+
+              <button
+                type="submit"
+                className="w-full bg-gradient-to-r from-[#8D2B7E] to-[#FF96F5] text-white rounded-xl px-6 py-4 hover:from-[#A259C6] hover:to-[#FF96F5] transition-all text-base font-bold shadow-[0_4px_20px_rgba(141,43,126,0.4)] hover:shadow-[0_6px_25px_rgba(141,43,126,0.6)] transform hover:-translate-y-0.5 mt-4"
+              >
+                🚀 Launch Sprint
+              </button>
             </div>
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-[#FF96F5] mb-2">
-                Sprint Duration (days)
-              </label>
-              <input
-                type="number"
-                placeholder="e.g., 7"
-                {...register("sprintDuration", { required: true })}
-                className="w-full px-4 py-2.5 bg-[#2D033B]/50 border border-[#8D2B7E]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8D2B7E] text-white placeholder-gray-500 text-sm sm:text-base"
-              />
-            </div>
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-[#FF96F5] mb-2">
-                Sprint Start Date
-              </label>
-              <input
-                type="date"
-                {...register("sprintStartDate", { required: true })}
-                className="w-full px-4 py-2.5 bg-[#2D033B]/50 border border-[#8D2B7E]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8D2B7E] text-white text-sm sm:text-base [color-scheme:dark]"
-              />
-            </div>
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-[#FF96F5] mb-2">
-                Max Team Size
-              </label>
-              <input
-                type="number"
-                placeholder="e.g., 5"
-                {...register("teamSize", { required: true })}
-                className="w-full px-4 py-2.5 bg-[#2D033B]/50 border border-[#8D2B7E]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8D2B7E] text-white placeholder-gray-500 text-sm sm:text-base"
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full bg-gradient-to-r from-[#8D2B7E] to-[#FF96F5] text-white rounded-lg px-4 py-3 hover:from-[#A259C6] hover:to-[#FF96F5] transition-all text-sm sm:text-base font-semibold shadow-lg mt-2"
-            >
-              Create Sprint
-            </button>
           </form>
         </div>
       )}

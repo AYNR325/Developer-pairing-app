@@ -24,10 +24,18 @@ const TaskDetailsPopup = ({
   // Fetch sprint members for assignment dropdown
   useEffect(() => {
     const fetchSprintMembers = async () => {
+      // Safely access sprint ID
+      const sprintId = task.sprint?._id || task.sprint;
+      
+      if (!sprintId) {
+        console.warn("No sprint ID found in task data:", task);
+        return;
+      }
+
       try {
         setLoading(true);
         const res = await axios.get(
-          `${API_BASE}/sprint/${task.sprint._id}/members`,
+          `${API_BASE}/sprint/${sprintId}/members`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setSprintMembers(res.data.members);
@@ -38,8 +46,12 @@ const TaskDetailsPopup = ({
         setLoading(false);
       }
     };
-    fetchSprintMembers();
-  }, [task.sprint._id, token]);
+    
+    // Only fetch if we have a sprint ID
+    if (task.sprint) {
+      fetchSprintMembers();
+    }
+  }, [task.sprint, token]);
 
   // Add new comment
   const handleAddComment = async () => {

@@ -45,7 +45,17 @@ function Chat() {
     const newSocket = io(`${import.meta.env.VITE_API_URL}`, {
       auth: {
         token: token
-      }
+      },
+      transports: ['websocket'], // Force websocket to avoid Session ID unknown error on load balancers
+      withCredentials: true,
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+    });
+
+    newSocket.on('connect_error', (err) => {
+      console.error('Socket connection error:', err);
+      // Fallback to polling if websocket fails (optional strategy, currently keeping forced websocket to avoid session issues)
     });
 
     newSocket.on('connect', () => {
@@ -308,7 +318,7 @@ function Chat() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex">
+    <div className="h-screen bg-black text-white flex overflow-hidden">
       {/* Left Sidebar - Conversations List */}
       <div className={`w-full md:w-1/3 border-r border-[#8D2B7E]/20 flex flex-col ${
         showChatView ? 'hidden md:flex' : 'flex'

@@ -161,108 +161,93 @@ function Login() {
   
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
-      <ToastContainer
-position="top-center"
-autoClose={5000}
-hideProgressBar={false}
-newestOnTop={false}
-closeOnClick={false}
-rtl={false}
-pauseOnFocusLoss
-draggable
-pauseOnHover
-theme="dark"
+    <div className="min-h-screen bg-black flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background Blobs */}
+      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#8D2B7E]/20 rounded-full blur-[120px] pointer-events-none"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-[#FF96F5]/10 rounded-full blur-[120px] pointer-events-none"></div>
 
-/>
-      <div className="w-full max-w-md space-y-8 bg-[#111] rounded-3xl border border-[#8D2B7E]/20 p-8">
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
+      
+      <div className="w-full max-w-md space-y-8 bg-[#111]/60 backdrop-blur-xl rounded-3xl border border-[#8D2B7E]/30 p-8 shadow-[0_0_40px_rgba(141,43,126,0.2)] relative z-10 transition-all hover:shadow-[0_0_60px_rgba(141,43,126,0.3)]">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-white mb-2">Login</h1>
+           <div className="inline-flex justify-center items-center h-16 w-16 rounded-full bg-gradient-to-tr from-[#8D2B7E] to-[#FF96F5] mb-6 shadow-lg">
+              <Lock className="h-8 w-8 text-white" />
+           </div>
+          <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#FF96F5] to-[#8D2B7E] mb-2">Welcome Back</h1>
+          <p className="text-gray-400">Enter your credentials to access your account</p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="relative">
-            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-              <Mail className="h-5 w-5 text-[#8D2B7E]" />
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-8">
+          <div className="space-y-4">
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none transition-colors group-focus-within:text-[#FF96F5]">
+                <Mail className="h-5 w-5 text-gray-500 group-focus-within:text-[#FF96F5]" />
+              </div>
+              <input
+                type="email"
+                {...register('email', { 
+                  required: 'Email is required',
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message: "Invalid email address"
+                  }
+                })}
+                className="w-full bg-black/50 text-white pl-10 pr-4 py-4 rounded-xl border border-[#8D2B7E]/20 focus:outline-none focus:border-[#FF96F5] focus:ring-1 focus:ring-[#FF96F5] placeholder-gray-600 transition-all duration-300"
+                placeholder="Email Address"
+              />
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1 ml-1">{errors.email.message}</p>
+              )}
             </div>
-            <input
-              type="email"
-              {...register('email', { 
-                required: 'Email is required',
-                pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: "Invalid email address"
-                }
-              })}
-              className="w-full bg-black text-white pl-10 pr-4 py-3 rounded-lg border border-[#8D2B7E]/20 focus:outline-none focus:border-[#8D2B7E] placeholder-gray-500"
-              placeholder="Email"
-            />
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-            )}
-          </div>
 
-          <div className="relative">
-            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-              <Lock className="h-5 w-5 text-[#8D2B7E]" />
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none transition-colors group-focus-within:text-[#FF96F5]">
+                <Lock className="h-5 w-5 text-gray-500 group-focus-within:text-[#FF96F5]" />
+              </div>
+              <input
+                type="password"
+                {...register('password', { required: 'Password is required' })}
+                className="w-full bg-black/50 text-white pl-10 pr-4 py-4 rounded-xl border border-[#8D2B7E]/20 focus:outline-none focus:border-[#FF96F5] focus:ring-1 focus:ring-[#FF96F5] placeholder-gray-600 transition-all duration-300"
+                placeholder="Password"
+              />
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1 ml-1">{errors.password.message}</p>
+              )}
             </div>
-            <input
-              type="password"
-              {...register('password', { required: 'Password is required' })}
-              className="w-full bg-black text-white pl-10 pr-4 py-3 rounded-lg border border-[#8D2B7E]/20 focus:outline-none focus:border-[#8D2B7E] placeholder-gray-500"
-              placeholder="Password"
-            />
-            {errors.password && (
-              <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
-            )}
           </div>
 
           <div className="flex justify-between items-center text-sm">
-            <Link to="/forgot-password" className="text-[#8D2B7E] hover:underline">
-              Forgot Password
+            <Link to="/auth/register" className="text-gray-400 hover:text-[#FF96F5] transition-colors">
+              Create an account
             </Link>
-            <Link to="/auth/register" className="text-[#8D2B7E] hover:underline">
-              Sign up
+            <Link to="/forgot-password" className="text-[#FF96F5] hover:text-[#8D2B7E] transition-colors font-medium">
+              Forgot Password?
             </Link>
           </div>
 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-[#8D2B7E] text-white py-3 rounded-lg hover:bg-[#8D2B7E]/90 transition-colors disabled:opacity-50"
+            className="w-full bg-gradient-to-r from-[#8D2B7E] to-[#A259C6] text-white py-4 rounded-xl font-bold text-lg shadow-[0_0_20px_rgba(141,43,126,0.4)] hover:shadow-[0_0_30px_rgba(141,43,126,0.6)] hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:from-[#A259C6] hover:to-[#8D2B7E]"
           >
-            {isLoading ? 'Signing in...' : 'Sign In'}
+            {isLoading ? (
+              <span className="flex items-center justify-center gap-2">
+                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                 Signing in...
+              </span>
+            ) : 'Sign In'}
           </button>
-
-          {/* <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-700"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-[#111] text-gray-400">or</span>
-            </div>
-          </div> */}
-
-          {/* <div className="grid grid-cols-3 gap-4">
-            <button
-              type="button"
-              className="flex items-center justify-center p-2 bg-black rounded-lg border border-[#8D2B7E]/20 hover:border-[#8D2B7E] transition-colors"
-            >
-              <img src="/google.png" alt="Google" className="w-6 h-6" />
-            </button>
-            <button
-              type="button"
-              className="flex items-center justify-center p-2 bg-black rounded-lg border border-[#8D2B7E]/20 hover:border-[#8D2B7E] transition-colors"
-            >
-              <img src="/github.png" alt="GitHub" className="w-6 h-6" />
-            </button>
-            <button
-              type="button"
-              className="flex items-center justify-center p-2 bg-black rounded-lg border border-[#8D2B7E]/20 hover:border-[#8D2B7E] transition-colors"
-            >
-              <img src="/linkedin.png" alt="LinkedIn" className="w-6 h-6" />
-            </button>
-          </div> */}
         </form>
       </div>
     </div>

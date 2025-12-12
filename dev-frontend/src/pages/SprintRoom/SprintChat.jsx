@@ -199,7 +199,7 @@ function SprintChat() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col lg:flex-row">
+    <div className="h-screen bg-black text-white flex flex-col lg:flex-row overflow-hidden">
       {/* Mobile/Tablet Overlay */}
       {sidebarOpen && (
         <div

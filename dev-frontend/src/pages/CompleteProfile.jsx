@@ -4,7 +4,10 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer,toast } from 'react-toastify';
 
+import { useUser } from '@/context/UserContext';
+
 function CompleteProfile() {
+  const { refreshUser } = useUser();
   const [step, setStep] = useState(() => {
     const saved = localStorage.getItem('profileStep');
     return saved ? parseInt(saved) : 1;
@@ -221,6 +224,9 @@ function CompleteProfile() {
       localStorage.removeItem('profileForm');
       localStorage.removeItem('profileStep');
       localStorage.removeItem('profilePhoto');
+
+      // Refresh user context to ensure Dashboard gets the latest data
+      await refreshUser();
       
       // alert("Profile updated!");
       toast.success('Profile updated!', {
@@ -274,38 +280,61 @@ function CompleteProfile() {
   ];
 
   return (
-    <div className="min-h-screen bg-black text-white p-6">
-      <ToastContainer
-position="top-center"
-autoClose={5000}
-hideProgressBar={false}
-newestOnTop={false}
-closeOnClick={false}
-rtl={false}
-pauseOnFocusLoss
-draggable
-pauseOnHover
-theme="dark"
+    <div className="min-h-screen bg-black text-white p-4 sm:p-6 relative overflow-hidden flex flex-col items-center">
+       {/* Background Blobs */}
+      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#8D2B7E]/20 rounded-full blur-[120px] pointer-events-none"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-[#FF96F5]/10 rounded-full blur-[120px] pointer-events-none"></div>
 
-/>
-      <div className="flex items-center gap-2 mb-8">
-        <span className="text-[#8D2B7E] text-2xl">&lt;/&gt;</span>
-        <span className="text-[#8D2B7E] text-2xl font-semibold">DevHub</span>
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
+      
+      <div className="flex items-center gap-2 mb-8 relative z-10 mt-4">
+        {/* <span className="text-[#8D2B7E] text-2xl">&lt;/&gt;</span>
+        <span className="text-[#8D2B7E] text-2xl font-semibold">DevHub</span> */}
+        <span className="bg-gradient-to-r from-[#8D2B7E] via-[#FF96F5] to-[#A259C6] bg-clip-text text-transparent text-3xl sm:text-4xl font-bold drop-shadow-[0_2px_8px_rgba(141,43,126,0.25)] animate-gradient-x select-none">
+              &lt;/&gt;
+            </span>
+            <span className="ml-2 relative text-3xl sm:text-4xl font-extrabold  tracking-wide select-none">
+              <span className="bg-gradient-to-r from-[#FF96F5] via-[#8D2B7E] to-[#A259C6] bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(255,150,245,0.15)] animate-gradient-x">
+                Dev
+              </span>
+              <span className="bg-gradient-to-r from-[#A259C6] to-[#FF96F5] bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(162,89,198,0.17)] animate-gradient-x">
+                Hub
+              </span>
+              <span className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-[#FF96F5]/50 via-[#8D2B7E]/30 to-transparent rounded-full blur-sm opacity-80 pointer-events-none"></span>
+            </span>
       </div>
 
-      <div className="max-w-3xl mx-auto bg-[#111] rounded-2xl p-8 border border-[#8D2B7E]/20">
-        <h1 className="text-3xl font-bold mb-4">Create your profile</h1>
-        
+      <div className="w-full max-w-3xl bg-[#111]/60 backdrop-blur-xl rounded-3xl p-6 sm:p-10 border border-[#8D2B7E]/30 shadow-[0_0_40px_rgba(141,43,126,0.2)] relative z-10 transition-all">
+        <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#FF96F5] to-[#8D2B7E] mb-2">{step === 1 ? "Create Profile" : "Professional Details"}</h1>
+         <div className="w-full bg-gray-800 h-1.5 rounded-full mb-8 overflow-hidden">
+            <div 
+              className="bg-gradient-to-r from-[#8D2B7E] to-[#FF96F5] h-full transition-all duration-500 ease-out"
+              style={{ width: step === 1 ? '50%' : '100%' }}
+            ></div>
+         </div>
+         
         <form onSubmit={handleSubmit(onSubmit)}>
           {step === 1 ? (
             <>
-              <p className="text-gray-400 mb-8">
-                Thank you for joining our platform, let's set up your profile this will help the team to identify and mention you.
+              <p className="text-gray-400 mb-8 text-lg">
+                Let's set up the basics. This helps the community identify you.
               </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+                <div className="md:col-span-7 space-y-6">
                 <div>
+                     <label className="text-sm font-medium text-gray-400 mb-1 block">Username</label>
                     <input
                       type="text"
                       placeholder="Username"
@@ -317,13 +346,14 @@ theme="dark"
                         }
                       })}
                       disabled
-                      className={`w-full bg-black border ${errors.username ? 'border-red-500' : 'border-[#8D2B7E]/20'} rounded-md p-3 focus:outline-none focus:border-[#8D2B7E] disabled:opacity-50 disabled:cursor-not-allowed`}
+                      className={`w-full bg-black/50 text-white pl-4 pr-4 py-3 rounded-xl border ${errors.username ? 'border-red-500' : 'border-[#8D2B7E]/20'} focus:outline-none focus:border-[#FF96F5] disabled:opacity-50 disabled:cursor-not-allowed`}
                     />
                     {errors.username && (
                       <p className="text-red-500 text-sm mt-1">{errors.username.message}</p>
                     )}
                   </div>
                   <div>
+                    <label className="text-sm font-medium text-gray-400 mb-1 block">Email</label>
                     <input
                       type="email"
                       placeholder="Email"
@@ -335,7 +365,7 @@ theme="dark"
                         }
                       })}
                       disabled
-                      className={`w-full bg-black border ${errors.email ? 'border-red-500' : 'border-[#8D2B7E]/20'} rounded-md p-3 focus:outline-none focus:border-[#8D2B7E] disabled:opacity-50 disabled:cursor-not-allowed`}
+                      className={`w-full bg-black/50 text-white pl-4 pr-4 py-3 rounded-xl border ${errors.email ? 'border-red-500' : 'border-[#8D2B7E]/20'} focus:outline-none focus:border-[#FF96F5] disabled:opacity-50 disabled:cursor-not-allowed`}
                     />
                     {errors.email && (
                       <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
@@ -343,28 +373,30 @@ theme="dark"
                   </div>
                   
                   <div>
+                    <label className="text-sm font-medium text-gray-400 mb-1 block">Location</label>
                     <input
                       type="text"
-                      placeholder="Location"
+                      placeholder="City, Country"
                       {...register("location", {
                         required: "Location is required",
                         minLength: { value: 2, message: "Location must be at least 2 characters" }
                       })}
-                      className={`w-full bg-black border ${errors.location ? 'border-red-500' : 'border-[#8D2B7E]/20'} rounded-md p-3 focus:outline-none focus:border-[#8D2B7E]`}
+                      className={`w-full bg-black/50 text-white pl-4 pr-4 py-3 rounded-xl border ${errors.location ? 'border-red-500' : 'border-[#8D2B7E]/20'} focus:outline-none focus:border-[#FF96F5] transition-colors`}
                     />
                     {errors.location && (
                       <p className="text-red-500 text-sm mt-1">{errors.location.message}</p>
                     )}
                   </div>
                   <div>
+                     <label className="text-sm font-medium text-gray-400 mb-1 block">Bio</label>
                     <textarea
-                      placeholder="Add Bio"
+                      placeholder="Tell us a bit about yourself..."
                       {...register("bio", {
                         required: "Bio is required",
                         maxLength: { value: 500, message: "Bio must be less than 500 characters" }
                       })}
                       rows="4"
-                      className={`w-full bg-black border ${errors.bio ? 'border-red-500' : 'border-[#8D2B7E]/20'} rounded-md p-3 focus:outline-none focus:border-[#8D2B7E]`}
+                      className={`w-full bg-black/50 text-white pl-4 pr-4 py-3 rounded-xl border ${errors.bio ? 'border-red-500' : 'border-[#8D2B7E]/20'} focus:outline-none focus:border-[#FF96F5] transition-colors resize-none`}
                     />
                     {errors.bio && (
                       <p className="text-red-500 text-sm mt-1">{errors.bio.message}</p>
@@ -372,13 +404,14 @@ theme="dark"
                   </div>
                 </div>
 
-                <div className="flex flex-col items-center justify-center">
+                <div className="md:col-span-5 flex flex-col items-center justify-start pt-4">
                   {photoPreview ? (
-                    <div className="relative">
+                    <div className="relative group">
+                      <div className="absolute -inset-1 bg-gradient-to-r from-[#8D2B7E] to-[#FF96F5] rounded-full opacity-75 blur transition duration-1000 group-hover:duration-200"></div>
                       <img 
                         src={photoPreview} 
                         alt="Profile preview" 
-                        className="w-32 h-32 rounded-full object-cover mb-4"
+                        className="relative w-40 h-40 rounded-full object-cover border-4 border-black"
                       />
                       <button
                         type="button"
@@ -386,19 +419,19 @@ theme="dark"
                           setPhotoPreview(null);
                           setValue('photo', null);
                         }}
-                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 text-sm"
+                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1.5 text-sm hover:bg-red-600 transition-colors z-20 shadow-lg"
                       >
                         ×
                       </button>
                     </div>
                   ) : (
-                    <div className="w-32 h-32 bg-[#8D2B7E] rounded-full mb-4 flex items-center justify-center">
-                      <span className="text-white text-4xl font-semibold">
+                    <div className="w-40 h-40 rounded-full mb-4 flex items-center justify-center bg-gradient-to-br from-[#8D2B7E] to-[#2a0a25] border border-[#FF96F5]/30 shadow-[0_0_30px_rgba(141,43,126,0.5)]">
+                      <span className="text-[#FF96F5] text-5xl font-bold">
                         {watch('username')?.charAt(0)?.toUpperCase() || 'U'}
                       </span>
                     </div>
                   )}
-                  <div className="w-40 h-40 bg-[#8D2B7E]/20 rounded-3xl"></div>
+                  {/* <div className="w-40 h-40 bg-[#8D2B7E]/20 rounded-3xl"></div> */}
                   <input
                     type="file"
                     {...register("photo")}
@@ -409,46 +442,46 @@ theme="dark"
                   />
                   <label
                     htmlFor="photo-upload"
-                    className="mt-4 text-white cursor-pointer hover:text-[#8D2B7E] transition-colors"
+                    className="mt-6 px-6 py-2 rounded-full border border-[#FF96F5]/50 text-[#FF96F5] font-semibold cursor-pointer hover:bg-[#FF96F5] hover:text-black transition-all duration-300 shadow-[0_0_15px_rgba(255,150,245,0.2)]"
                   >
-                    ADD YOUR PHOTO
+                    Upload Photo
                   </label>
                 </div>
               </div>
 
-              <div className="mt-8 flex justify-end">
+              <div className="mt-10 flex justify-end">
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="bg-[#8D2B7E] text-white px-8 py-2 rounded-md hover:bg-[#8D2B7E]/80 transition-colors"
+                  className="bg-gradient-to-r from-[#8D2B7E] to-[#A259C6] text-white px-10 py-3 rounded-xl font-bold hover:shadow-[0_0_20px_rgba(141,43,126,0.6)] hover:-translate-y-0.5 transition-all duration-300"
                 >
-                  Next →
+                  Next Step →
                 </button>
               </div>
             </>
           ) : (
             <>
-              <p className="text-gray-400 mb-8">
-                Add your Experience, Skills & programming languages.
+              <p className="text-gray-400 mb-8 text-lg">
+                Showcase your expertise. This helps in matching you with the right teams.
               </p>
 
-              <div className="grid grid-cols-1 gap-8">
-                <div className="space-y-6">
-                  <div>
-                    <p className="mb-2">Experience Level:</p>
-                    <div className="flex gap-4">
+              <div className="space-y-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                   <div>
+                    <label className="text-sm font-medium text-gray-400 mb-3 block">Experience Level</label>
+                    <div className="grid grid-cols-3 gap-2">
                       {['Beginner', 'Intermediate', 'Expert'].map(level => (
                         <button
                           key={level}
                           type="button"
                           onClick={() => setValue('experienceLevel', level)}
-                          className={`px-4 py-2 rounded-md ${
+                          className={`px-2 py-2.5 text-sm sm:text-base rounded-lg font-medium transition-all duration-300 ${
                             watch('experienceLevel') === level
-                              ? 'bg-[#8D2B7E] text-white'
-                              : 'bg-black border border-[#8D2B7E]/20'
+                              ? 'bg-[#8D2B7E] text-white shadow-[0_0_15px_rgba(141,43,126,0.5)]'
+                              : 'bg-black/40 text-gray-400 border border-[#8D2B7E]/20 hover:border-[#FF96F5]/50 hover:text-white'
                           }`}
                         >
-                          {level.charAt(0) + level.slice(1).toLowerCase()}
+                          {level}
                         </button>
                       ))}
                     </div>
@@ -458,7 +491,7 @@ theme="dark"
                   </div>
 
                   <div>
-                    <p className="mb-2">Experience Year:</p>
+                    <label className="text-sm font-medium text-gray-400 mb-3 block">Years of Experience</label>
                     <input
                       type="number"
                       {...register("experienceYears", {
@@ -467,71 +500,72 @@ theme="dark"
                         max: { value: 50, message: "Please enter a valid experience" }
                       })}
                       min="0"
-                      className={`w-32 bg-black border ${errors.experienceYears ? 'border-red-500' : 'border-[#8D2B7E]/20'} rounded-md p-3 focus:outline-none focus:border-[#8D2B7E]`}
+                      className={`w-full bg-black/50 text-white pl-4 pr-4 py-2.5 rounded-xl border ${errors.experienceYears ? 'border-red-500' : 'border-[#8D2B7E]/20'} focus:outline-none focus:border-[#FF96F5] transition-colors`}
                     />
                     {errors.experienceYears && (
                       <p className="text-red-500 text-sm mt-1">{errors.experienceYears.message}</p>
                     )}
                   </div>
+                </div>
 
-                  <div>
-                    <p className="mb-2">Select Your Programming Languages (Multi-select)</p>
-                    <div className="grid grid-cols-3 gap-3">
-                      {programmingLanguages.map(lang => (
-                        <button
-                          key={lang}
-                          type="button"
-                          onClick={() => handleLanguageToggle(lang)}
-                          className={`px-4 py-2 rounded-md ${
-                            (watch('programmingLanguages') || []).includes(lang)
-                              ? 'bg-[#8D2B7E] text-white'
-                              : 'bg-black border border-[#8D2B7E]/20'
-                          }`}
-                        >
-                          {lang}
-                        </button>
-                      ))}
-                    </div>
-                    {errors.programmingLanguages && (
-                      <p className="text-red-500 text-sm mt-1">{errors.programmingLanguages.message}</p>
-                    )}
+                <div>
+                  <label className="text-sm font-medium text-gray-400 mb-3 block">Programming Languages <span className="text-[#8D2B7E] text-xs">(Multi-select)</span></label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                    {programmingLanguages.map(lang => (
+                      <button
+                        key={lang}
+                        type="button"
+                        onClick={() => handleLanguageToggle(lang)}
+                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                          (watch('programmingLanguages') || []).includes(lang)
+                            ? 'bg-[#8D2B7E]/80 text-white border border-[#FF96F5]/50 shadow-[0_0_10px_rgba(141,43,126,0.3)]'
+                            : 'bg-black/40 text-gray-400 border border-[#8D2B7E]/20 hover:bg-[#8D2B7E]/20 hover:text-white'
+                        }`}
+                      >
+                        {lang}
+                      </button>
+                    ))}
                   </div>
+                  {errors.programmingLanguages && (
+                    <p className="text-red-500 text-sm mt-1">{errors.programmingLanguages.message}</p>
+                  )}
+                </div>
 
-                  <div>
-                    <p className="mb-2">Select Your Domains (Multi-select)</p>
-                    <div className="grid grid-cols-2 gap-3">
-                      {domainSkills.map(domain => (
-                        <button
-                          key={domain}
-                          type="button"
-                          onClick={() => handleDomainToggle(domain)}
-                          className={`px-4 py-2 rounded-md ${
-                            (watch('domains') || []).includes(domain)
-                              ? 'bg-[#8D2B7E] text-white'
-                              : 'bg-black border border-[#8D2B7E]/20'
-                          }`}
-                        >
-                          {domain}
-                        </button>
-                      ))}
-                    </div>
-                    {errors.domains && (
-                      <p className="text-red-500 text-sm mt-1">{errors.domains.message}</p>
-                    )}
+                <div>
+                  <label className="text-sm font-medium text-gray-400 mb-3 block">Domains <span className="text-[#8D2B7E] text-xs">(Multi-select)</span></label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {domainSkills.map(domain => (
+                      <button
+                        key={domain}
+                        type="button"
+                        onClick={() => handleDomainToggle(domain)}
+                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                          (watch('domains') || []).includes(domain)
+                            ? 'bg-[#8D2B7E]/80 text-white border border-[#FF96F5]/50 shadow-[0_0_10px_rgba(141,43,126,0.3)]'
+                            : 'bg-black/40 text-gray-400 border border-[#8D2B7E]/20 hover:bg-[#8D2B7E]/20 hover:text-white'
+                        }`}
+                      >
+                        {domain}
+                      </button>
+                    ))}
                   </div>
+                  {errors.domains && (
+                    <p className="text-red-500 text-sm mt-1">{errors.domains.message}</p>
+                  )}
+                </div>
 
-                  <div>
-                    <p className="mb-2">Availability</p>
-                    <div className="flex gap-4">
+                <div>
+                   <label className="text-sm font-medium text-gray-400 mb-3 block">Availability</label>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       {['Full-time', 'Weekends', 'Part-time'].map(time => (
                         <button
                           key={time}
                           type="button"
                           onClick={() => setValue('availability', time)}
-                          className={`px-4 py-2 rounded-md ${
+                          className={`px-4 py-3 rounded-lg font-medium transition-all duration-300 ${
                             watch('availability') === time
-                              ? 'bg-[#8D2B7E] text-white'
-                              : 'bg-black border border-[#8D2B7E]/20'
+                              ? 'bg-[#8D2B7E] text-white shadow-[0_0_15px_rgba(141,43,126,0.5)]'
+                              : 'bg-black/40 text-gray-400 border border-[#8D2B7E]/20 hover:border-[#FF96F5]/50 hover:text-white'
                           }`}
                         >
                           {time.replace('-', ' ')}
@@ -542,22 +576,21 @@ theme="dark"
                       <p className="text-red-500 text-sm mt-1">{errors.availability.message}</p>
                     )}
                   </div>
-                </div>
               </div>
 
-              <div className="mt-8 flex justify-between">
+              <div className="mt-10 flex justify-between items-center">
                 <button
                   type="button"
                   onClick={handleBack}
-                  className="bg-transparent border border-[#8D2B7E]/20 text-white px-8 py-2 rounded-md hover:border-[#8D2B7E] transition-colors"
+                  className="text-gray-400 hover:text-white px-6 py-2 transition-colors font-medium flex items-center group"
                 >
-                  ← Back
+                  <span className="mr-2 group-hover:-translate-x-1 transition-transform">←</span> Back
                 </button>
                 <button
                   type="submit"
-                  className="bg-[#8D2B7E] text-white px-8 py-2 rounded-md hover:bg-[#8D2B7E]/80 transition-colors"
+                  className="bg-gradient-to-r from-[#8D2B7E] to-[#A259C6] text-white px-10 py-3 rounded-xl font-bold hover:shadow-[0_0_20px_rgba(141,43,126,0.6)] hover:-translate-y-0.5 transition-all duration-300"
                 >
-                  Save
+                  Complete Profile
                 </button>
               </div>
             </>

@@ -15,9 +15,17 @@ const allowedOrigins = [
 
 const io = socketIo(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      const isAllowed = allowedOrigins.includes(origin) || !origin || origin.endsWith('.vercel.app');
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ["GET", "POST"],
-    credentials: true
+    credentials: true,
+    transports: ['websocket', 'polling'] // Server still allows both, but client will force websocket
   }
 });
 
@@ -34,19 +42,30 @@ mongoose.connect(process.env.MONGO_URL)
  .catch(err => console.error(err));
 
 // Configure CORS first
+// Configure CORS first
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (like Postman, curl)
     if (!origin) return callback(null, true);
 
-    if (allowedOrigins.includes(origin)) {
+    // Check against allowed origins or allow if in development
+    if (allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
       return callback(null, true);
+    }
+    
+    // For Vercel deployments, we might need to be more permissive or ensure CLIENT_BASE_URL is set correctly
+    // Temporary allow all for debugging if needed, but best to rely on env vars.
+    // However, since user reported issues, let's log and allow dynamic vercel origins if consistent with our app
+    if (origin.endsWith('.vercel.app')) {
+       return callback(null, true);
     }
 
     console.log("❌ CORS blocked origin:", origin);
     return callback(new Error("Not allowed by CORS"));
   },
   credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 // Configure body-parser with increased limits
