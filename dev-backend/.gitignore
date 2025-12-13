@@ -27,3 +27,6 @@ node_modules
 # dist
 dist
 
+# deployment guides
+RENDER_DEPLOYMENT_GUIDE.md
+KEEP_ALIVE_SETUP.md
