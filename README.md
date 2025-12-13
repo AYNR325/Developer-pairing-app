@@ -2,12 +2,6 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-2.0-blue.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
-![React](https://img.shields.io/badge/React-18.3.1-61DAFB?logo=react)
-![Node.js](https://img.shields.io/badge/Node.js-Express-339933?logo=node.js)
-![MongoDB](https://img.shields.io/badge/MongoDB-8.14.0-47A248?logo=mongodb)
-
 **A full-stack web application that connects developers for collaborative sprint-based projects with AI-powered matching, real-time communication, and comprehensive project management tools.**
 
 [Features](#-key-features) • [Installation](#-installation--setup) • [Tech Stack](#-tech-stack) • [Project Structure](#-project-structure) • [API Documentation](#-api-documentation)
