@@ -69,7 +69,7 @@ function SprintSidebar({ onNavigate }) {
       
       {/* Footer / User Info could go here */}
       <div className="p-4 border-t border-[#8D2B7E]/20 bg-[#2D033B]/30">
-         <p className="text-xs text-center text-gray-500 font-mono">Dev-Pair v1.0</p>
+         <p className="text-xs text-center text-gray-500 font-mono">DevHub v1.0</p>
       </div>
     </div>
   );

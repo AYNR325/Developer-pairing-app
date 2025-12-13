@@ -304,7 +304,14 @@ const TaskDetailsPopup = ({
                 {/* Description */}
                 <div className="bg-black/40 p-4 rounded-xl border border-[#8D2B7E]/20">
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-lg font-semibold text-[#8D2B7E]">Description</h3>
+                    <div className="flex items-center gap-3">
+                      <h3 className="text-lg font-semibold text-[#8D2B7E]">Description</h3>
+                      {!isSprintCreator && (
+                        <span className="bg-yellow-900/20 border border-yellow-500/50 text-yellow-300 px-2 py-0.5 rounded text-xs select-none">
+                          Read-only
+                        </span>
+                      )}
+                    </div>
                     {/* Only show edit button to sprint creator */}
                     {isSprintCreator && (
                       <button
@@ -346,11 +353,6 @@ const TaskDetailsPopup = ({
                       <p className="text-gray-300 whitespace-pre-wrap">
                         {description || "No description provided"}
                       </p>
-                      {!isSprintCreator && (
-                        <div className="absolute top-0 right-0 bg-yellow-900/20 border border-yellow-500/50 text-yellow-300 px-2 py-1 rounded text-xs">
-                          Read-only
-                        </div>
-                      )}
                     </div>
                   )}
                 </div>

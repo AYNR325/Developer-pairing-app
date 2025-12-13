@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useUser } from '@/context/UserContext';
 import SprintSidebar from '@/components/SprintRoom/SprintSidebar';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
 
 const hasSprintEnded = (sprint) => {
   if (!sprint) return false;
@@ -29,6 +30,7 @@ function SprintTeams() {
         );
         setSprintInfo(res.data.sprint);
         if (hasSprintEnded(res.data.sprint)) {
+          toast.info("Sprint has ended. Redirecting to summary.");
           navigate(`/sprint/${sprintId}/end`);
         }
       } catch (err) {
@@ -56,6 +58,18 @@ function SprintTeams() {
 
   return (
     <div className="h-screen bg-black flex flex-col lg:flex-row relative overflow-hidden font-sans selection:bg-[#FF96F5] selection:text-black">
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
       {/* Background decoration */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
           <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#8D2B7E]/20 rounded-full blur-[120px]"></div>

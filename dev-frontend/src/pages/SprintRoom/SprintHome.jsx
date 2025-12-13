@@ -61,6 +61,7 @@ function SprintHome() {
       console.log(res.data.sprint);
       setSprintInfo(res.data.sprint);
     if (hasSprintEnded(res.data.sprint)) {
+        toast.info("Sprint has ended. Redirecting to summary.");
         navigate(`/sprint/${sprintId}/end`);
       }
     } catch (err) {
@@ -382,8 +383,7 @@ function SprintHome() {
                     </a>
                   </div>
                 )}
-                {sprintInfo?.resources?.extraLinks?.length > 0 &&
-                  sprintInfo.resources.extraLinks.map((link, idx) => (
+                {sprintInfo?.resources?.extraLinks?.filter(link => link && link.trim() !== "").map((link, idx) => (
                     <div key={idx} className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
                       <span className="text-gray-400 text-sm sm:text-base min-w-[100px]">Extra Link:</span>
                       <a 
@@ -399,7 +399,7 @@ function SprintHome() {
                 {!sprintInfo?.resources?.github &&
                   !sprintInfo?.resources?.figma &&
                   !sprintInfo?.resources?.docs &&
-                  (!sprintInfo?.resources?.extraLinks || sprintInfo.resources.extraLinks.length === 0) && (
+                  (!sprintInfo?.resources?.extraLinks || sprintInfo.resources.extraLinks.every(l => !l || !l.trim())) && (
                     <div className="flex flex-col items-center justify-center py-8 text-gray-500 bg-white/5 rounded-xl border border-dashed border-gray-700">
                       <p className="text-sm">No resources added yet</p>
                     </div>

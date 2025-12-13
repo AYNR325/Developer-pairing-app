@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
 import { useUser } from "@/context/UserContext";
 import io from "socket.io-client";
 import axios from "axios";
@@ -16,6 +17,7 @@ const hasSprintEnded = (sprint) => {
 
 function SprintChat() {
   const { sprintId } = useParams();
+  const navigate = useNavigate();
   const { userData } = useUser();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
@@ -108,11 +110,12 @@ function SprintChat() {
         });
         setSprintMembers(res.data.sprint.teamMembers || []);
         const sprint = res.data.sprint;
-        const ended = hasSprintEnded(sprint);
-        setIsSprintEnded(ended);
-        if (ended) {
-          setNewMessage("");
+        if (hasSprintEnded(sprint)) {
+          toast.info("Sprint has ended. Redirecting to summary.");
+          navigate(`/sprint/${sprintId}/end`);
+          return;
         }
+        setIsSprintEnded(false);
       } catch (err) {
         console.error("Error fetching sprint info:", err);
       }
@@ -200,6 +203,18 @@ function SprintChat() {
 
   return (
     <div className="h-screen bg-black text-white flex flex-col lg:flex-row overflow-hidden">
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
       {/* Mobile/Tablet Overlay */}
       {sidebarOpen && (
         <div

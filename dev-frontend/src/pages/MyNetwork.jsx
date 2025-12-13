@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from "@/components/Navbar";
+import Sidebar from "@/components/Sidebar";
 function MyNetwork() {
   const [userData, setUserData] = useState(null);
   const [pendingRequests, setPendingRequests] = useState([]);
@@ -168,6 +169,12 @@ function MyNetwork() {
   return (
     <div className="min-h-screen bg-black text-white">
       <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} userData={userData} />
+      <Sidebar 
+        isOpen={sidebarOpen} 
+        onClose={() => setSidebarOpen(false)} 
+        onSignOut={handleSignOut}
+        isMobileOnly={true}
+      />
 
       <div className="pt-[60px] sm:pt-[73px]">
         

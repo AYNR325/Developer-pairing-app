@@ -3,7 +3,7 @@ import axios from "axios";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import SprintSidebar from "@/components/SprintRoom/SprintSidebar";
 import { useUser } from "@/context/UserContext";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 
 const hasSprintEnded = (sprint) => {
   if (!sprint) return false;
@@ -36,6 +36,7 @@ function SprintEndPage() {
         ]);
         const sprint = sprintRes.data.sprint;
         if (!hasSprintEnded(sprint)) {
+          toast.info("Sprint is still active. Summary will be available after sprint ends.");
           navigate(`/sprint/${sprintId}/home`);
           return;
         }

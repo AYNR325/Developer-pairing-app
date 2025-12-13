@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 
-const Sidebar = ({ isOpen, onClose, onSignOut }) => {
+const Sidebar = ({ isOpen, onClose, onSignOut, isMobileOnly = false }) => {
   const location = useLocation();
 
   const isActive = (path) => {
@@ -12,7 +12,9 @@ const Sidebar = ({ isOpen, onClose, onSignOut }) => {
     <>
       <aside
         className={`w-64 bg-[#1a1a1a]/60 backdrop-blur-xl border-r border-[#8D2B7E]/20 fixed left-0 top-[60px] sm:top-[73px] bottom-0 flex flex-col z-50 transform transition-transform duration-300 ease-in-out ${
-          isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          isOpen 
+            ? "translate-x-0" 
+            : `-translate-x-full ${!isMobileOnly ? "lg:translate-x-0" : ""}`
         }`}
       >
         <nav className="p-4 space-y-2 flex-grow overflow-y-auto custom-scrollbar">

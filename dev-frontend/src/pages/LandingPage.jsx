@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Code2, MessageSquare, Users, Rocket, ExternalLink, Github } from 'lucide-react';
+import { Code2, MessageSquare, Users, Rocket, ExternalLink, Github, Linkedin } from 'lucide-react';
 import heroImage from '../assets/hero-illustration.png';
 
 const LandingPage = () => {
@@ -19,7 +19,7 @@ const LandingPage = () => {
                 <span className="bg-gradient-to-r from-[#A259C6] to-[#FF96F5] bg-clip-text text-transparent">Hub</span>
               </span>
             </div>
-            <div className="flex items-center gap-6">
+            <div className="hidden md:flex items-center gap-6">
               <Link 
                 to="/auth/login" 
                 className="text-gray-300 hover:text-[#FF96F5] font-medium transition-colors text-base"
@@ -179,8 +179,10 @@ const LandingPage = () => {
              </div>
              <p className="text-sm text-gray-500">© 2025 DevHub Platform. All rights reserved.</p>
              <div className="flex gap-6">
-               <a href="#" className="text-gray-500 hover:text-[#FF96F5] transition-colors"><Github className="h-6 w-6"/></a>
-               <a href="#" className="text-gray-500 hover:text-[#FF96F5] transition-colors"><ExternalLink className="h-6 w-6"/></a>
+               {/* <a href="#" className="text-gray-500 hover:text-[#FF96F5] transition-colors"><Github className="h-6 w-6"/></a> */}
+               <Link to="https://github.com/AYNR325/Developer-pairing-app" className="text-gray-500 hover:text-[#FF96F5] transition-colors"><Github className="h-6 w-6"/></Link>
+               {/* <a href="#" className="text-gray-500 hover:text-[#FF96F5] transition-colors"><ExternalLink className="h-6 w-6"/></a> */}
+               <Link to="https://www.linkedin.com/in/ayush-rokade-972940310" className="text-gray-500 hover:text-[#FF96F5] transition-colors"><Linkedin className="h-6 w-6"/></Link>
              </div>
            </div>
         </div>
